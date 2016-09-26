@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!--Data set title-->
+<h3>Data set: {{ data.name }}</h3>
+
+<!-- Summary statistics organized in a table-->
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+        {% for h in data.headers %}
+        <td>{{ h }}</td>
+        {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in data.statslist %}
+    <tr>
+        {% for val in row %}
+        <td>{{ val }}</td>
+        {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div>
+<img src="{{ plot.url }}" width="100%"/>
+</div>
+
+{% endblock %}

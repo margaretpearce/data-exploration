@@ -1,0 +1,61 @@
+body {
+    padding-top: 70px;
+    padding-bottom: 30px;
+}
+
+.theme-dropdown .dropdown-menu {
+    position: static;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.theme-showcase > p > .btn {
+    margin: 5px 0;
+}
+
+.theme-showcase .navbar .container {
+    width: auto;
+}
+
+@media (min-width: 768px) {
+.panel-body-left, .panel-body-right {
+    float: left;
+}
+.panel-body-left-half {
+    width: 50%;
+    margin: auto;
+    float: left;
+}
+}
+
+.panel-body-right {
+    padding: 10pt;
+}
+
+.fileUpload {
+    position: relative;
+    overflow: hidden;
+    margin: 10px;
+}
+
+.fileUpload input.upload {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+.selectiondiv {
+    border:1px dashed black;
+    background:#D9FF00;
+    opacity:0.4;
+    filter:alpha(opacity=40);
+    margin:0px;
+    padding:0px;
+    display:none;
+}
