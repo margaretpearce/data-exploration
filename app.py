@@ -2,8 +2,6 @@ from flask import Flask
 from flask import render_template
 from dataexp_flask import DataExplorer
 import os
-import seaborn as sns
-import base64
 
 app = Flask(__name__)
 
@@ -22,9 +20,9 @@ def index():
             'headers' : datastats.get_headers(),
             'statslist' : datastats.get_stats()}
 
-    plot_src = datastats.summary_plots()
-    plot_url = os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.png")
-    plot_src.savefig(plot_url)
     plot = {'url' : "static/sampledata/titanic.png"}
 
-    return render_template('index.html', data=data, plot=plot)
+    hist_src = datastats.get_histograms()
+    hist = {'hist_urls' : hist_src}
+
+    return render_template('index.html', data=data, plot=plot, hist=hist)

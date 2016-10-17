@@ -26,8 +26,24 @@
 </table>
 </div>
 
-<div>
-<img src="{{ plot.url }}" width="100%"/>
+<!-- Histograms -->
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+        <td>Feature</td>
+        <td>Histogram</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for key in hist.hist_urls.keys() %}
+    <tr>
+        <td>{{ key }}</td>
+        <td><img src="{{ hist.hist_urls[key] }}" /></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 </div>
 
 {% endblock %}

@@ -30,3 +30,9 @@ for i in range(len(numeric_fieldnames)):
 # Remove rows with nulls and show summary graphs
 sns.pairplot(data.dropna()[numeric_fieldnames])
 sns.plt.show()
+
+hist = {}
+for feature in numeric_fieldnames:
+    feature_data = numeric_data[feature].dropna().tolist()
+    hist[feature] = sns.distplot(feature_data)
+    sns.plt.show()
