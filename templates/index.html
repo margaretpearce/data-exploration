@@ -5,6 +5,7 @@
 <h3>Data set: {{ data.name }}</h3>
 
 <!-- Summary statistics organized in a table-->
+<h4>Numeric</h4>
 <div class="table-responsive">
 <table class="table table-striped">
   <thead>
@@ -16,6 +17,28 @@
   </thead>
   <tbody>
   {% for row in data.statslist %}
+    <tr>
+        {% for val in row %}
+        <td>{{ val }}</td>
+        {% endfor %}
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<h4>Non-numeric</h4>
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+        {% for h in data.headerscat %}
+        <td>{{ h }}</td>
+        {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in data.statslistcat %}
     <tr>
         {% for val in row %}
         <td>{{ val }}</td>
