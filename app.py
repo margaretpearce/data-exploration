@@ -1,18 +1,34 @@
 from flask import Flask
-from flask import render_template
+from flask import render_template, session
 from dataexp_flask import DataExplorer
-import paths
-import os
+from data_driver import DataDriver
+import paths, key
+import os, json
 
 app = Flask(__name__)
 
 # Path information
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
+app.secret_key = key.SECRET_KEY;
+
 
 @app.route('/')
 @app.route('/index')
 def index():
+    # Read Titanic data
+    driver = DataDriver("titanic.csv", "Titanic")
+
+    # Get the JSON for the summary data
+    data_json = json.loads(driver.load_summary_json())
+
+    return render_template('index.html', data=data_json)
+
+def datasetselected():
+    return None
+
+@app.route('/features')
+def features():
     datastats = DataExplorer(os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.csv"),
                              "PassengerId",
                              "Survived",
@@ -30,11 +46,7 @@ def index():
     hist_src = datastats.get_histograms_numeric()
     hist = {'hist_urls' : hist_src}
 
-    return render_template('index.html', data=data, plot=plot, hist=hist)
-
-@app.route('/features')
-def features():
-    return render_template('features.html')
+    return render_template('features.html', data=data, plot=plot, hist=hist)
 
 @app.route('/interactions')
 def interactions():

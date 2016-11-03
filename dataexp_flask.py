@@ -46,12 +46,16 @@ class DataExplorer:
 
     def get_stats_nonnumeric(self):
         data_count = list(map(lambda x: self.nonnumeric_data[x].count(), self.nonnumeric_fieldnames))
-        data_missing = list(map(lambda x: self.nonnumeric_data[x].isnull().sum(), self.nonnumeric_fieldnames))
+        # data_missing = list(map(lambda x: self.nonnumeric_data[x].isnull().sum(), self.nonnumeric_fieldnames))
+        data_missing = list(map(lambda x: str("%s (%.3f%%)" %
+                            (self.nonnumeric_data[x].isnull().sum(),
+                            100 * (self.nonnumeric_data[x].isnull().sum() / float(len(self.nonnumeric_data[x]))))),
+                             self.nonnumeric_fieldnames))
         data_unique = list(map(lambda x: len(self.nonnumeric_data[x].unique()), self.nonnumeric_fieldnames))
-        data_mostcommon = list(map(lambda x: str("%s (%d)" % \
+        data_mostcommon = list(map(lambda x: str("%s (%d)" %
                             (self.nonnumeric_data[x].value_counts().idxmax(),
                              self.nonnumeric_data[x].value_counts().max())), self.nonnumeric_fieldnames))
-        data_leastcommon = list(map(lambda x: str("%s (%d)" % \
+        data_leastcommon = list(map(lambda x: str("%s (%d)" %
                             (self.nonnumeric_data[x].value_counts().idxmin(),
                              self.nonnumeric_data[x].value_counts().min())), self.nonnumeric_fieldnames))
 
@@ -90,3 +94,12 @@ class DataExplorer:
             # Return the relative URL to the histogram
             hist[feature] = paths.EXAMPLES_RELATIVE + str(feature + "_hist.png")
         return hist
+
+    def get_summary(self):
+        return zip(self.get_summary_headers(), self.get_summary_stats())
+
+    def get_summary_headers(self):
+        return ["Total # records", "Records with no missing data", "Records with 1 column missing data"]
+
+    def get_summary_stats(self):
+        return [891, 500, 132]
