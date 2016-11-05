@@ -1,9 +1,8 @@
 import pandas as pd
 import os
-import json
 import jsonpickle
 import paths
-from DataSummary import DataSummary
+from Summary import DataSummary
 
 SUMMARY_SUFFIX = "_summary.json"
 FEATURES_SUFFIX = "_features.json"
@@ -25,7 +24,7 @@ class DataDriver:
             self.load_data()
 
     def load_data(self):
-        # Load the data into a Pandas dataframe
+        # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
             self.data = pd.read_csv(self.filepath)
         elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
@@ -37,6 +36,8 @@ class DataDriver:
         # Get summary stats about the data and serialize it as JSON
         num_records = self.data.shape[0]
         num_features = self.data.shape[1]
+        index_column = self.id_column
+        label_column = self.label_column
 
         # Count the number of columns missing for each row
         count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis = 1)
@@ -50,11 +51,12 @@ class DataDriver:
         # Sample data (five rows)
         features_list = list(self.data.columns.values)
         sample_list = self.data.head()[features_list].values.tolist()
-        # sample_list = None
 
         summary = DataSummary(self.title,
                               num_records=num_records,
                               num_features=num_features,
+                              index_column=index_column,
+                              label_column=label_column,
                               rows_no_missing=num_rows_no_missing,
                               rows_one_missing=num_rows_one_missing,
                               rows_two_missing=num_rows_two_missing,

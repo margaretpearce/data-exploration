@@ -6,69 +6,72 @@
 
 <!-- Summary stats about the data set -->
 <div class="table-responsive">
-<table class="table table-striped">
-  <tbody>
-    <tr>
-        <td>Number of records</td>
-        <td>{{ data.num_records }}</td>
-    </tr>
-      <tr>
-        <td>Number of features</td>
-        <td>{{ data.num_features }}</td>
-    </tr>
-    </tbody>
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <td>Number of records</td>
+            <td>{{ data.num_records }}</td>
+        </tr>
+        <tr>
+            <td>Number of features</td>
+            <td>{{ data.num_features }}</td>
+        </tr>
+         <tr>
+            <td>Index column</td>
+            <td>{{ data.index_column }}</td>
+        </tr>
+         <tr>
+            <td>Label column</td>
+            <td>{{ data.label_column }}</td>
+        </tr>
+        </tbody>
     </table>
-    </div>
+</div>
 
 <h3>Missing data</h3>
 <div class="table-responsive">
-<table class="table table-striped">
-  <tbody>
-    <tr>
-        <td>Number of rows with no missing data</td>
-        <td>{{ data.rows_no_missing }}</td>
-    </tr>
-    <tr>
-        <td>Number of rows with one missing feature</td>
-        <td>{{ data.rows_one_missing }}</td>
-    </tr>
-    <tr>
-        <td>Number of rows with two missing features</td>
-        <td>{{ data.rows_two_missing }}</td>
-    </tr>
-    <tr>
-        <td>Number of rows with three or more missing features</td>
-        <td>{{ data.rows_three_more_missing }}</td>
-    </tr>
-  </tbody>
-</table>
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <td>Number of rows with no missing data</td>
+            <td>{{ data.rows_no_missing }}</td>
+        </tr>
+        <tr>
+            <td>Number of rows with one missing feature</td>
+            <td>{{ data.rows_one_missing }}</td>
+        </tr>
+        <tr>
+            <td>Number of rows with two missing features</td>
+            <td>{{ data.rows_two_missing }}</td>
+        </tr>
+        <tr>
+            <td>Number of rows with three or more missing features</td>
+            <td>{{ data.rows_three_more_missing }}</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 
 <h3>Sample rows</h3>
 <div class="table-responsive">
-<table class="table table-striped">
-  <thead>
-    <tr>
-        {% for h in data.features_list %}
-        <th>{{ h }}</th>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            {% for h in data.features_list %}
+            <th>{{ h }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in data.sample_list %}
+        <tr>
+            {% for val in row %}
+            <td>{{ val }}</td>
+            {% endfor %}
+        </tr>
         {% endfor %}
-    </tr>
-  </thead>
-  <tbody>
-  {% for row in data.sample_list %}
-    <tr>
-        {% for val in row %}
-        <td>{{ val }}</td>
-        {% endfor %}
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+        </tbody>
+    </table>
 </div>
-<!--<div>-->
-    <!--{{ data.features_list }}-->
-    <!--<br/>-->
-    <!--{{ data.sample_list }}-->
-<!--</div>-->
 
 {% endblock %}
