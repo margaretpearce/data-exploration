@@ -1,1 +1,3 @@
-__author__ = 'margaretpearce'
+class Features(object):
+    def __init__(self, name):
+        self.name = name
