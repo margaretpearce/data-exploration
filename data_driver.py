@@ -5,6 +5,9 @@ import jsonpickle
 import paths
 from DataSummary import DataSummary
 
+SUMMARY_SUFFIX = "_summary.json"
+FEATURES_SUFFIX = "_features.json"
+INTERACTIONS_SUFFIX = "_interactions.json"
 
 class DataDriver:
     def __init__(self, datafile, title, idcolumn=None, labelcolumn=None):
@@ -17,14 +20,11 @@ class DataDriver:
         # Other class variables
         self.data = None
 
-        # Check if the JSON files exist, and if not, load the data and generate them
+        # Check if the data file exists, and if so, load the data
         if os.path.isfile(self.filepath):
-            self.load_file()
-            self.generate_summary_json()
-            self.generate_features_json()
-            self.generate_interactions_json()
+            self.load_data()
 
-    def load_file(self):
+    def load_data(self):
         # Load the data into a Pandas dataframe
         if str(self.file).endswith("csv"):
             self.data = pd.read_csv(self.filepath)
@@ -50,20 +50,30 @@ class DataDriver:
         return None
 
     def load_summary_json(self):
-        # Read serialized JSON file
-        with open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_summary.json")), 'r') as summary_file:
-            summary_str = summary_file.read()
-            json_file = jsonpickle.decode(summary_str)
-        return json_file
+        return self.load_json(SUMMARY_SUFFIX)
 
     def load_features_json(self):
-        with open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_features.json")), 'r') as features_file:
-            data = json.load(features_file)
-        return data
+        return self.load_json(FEATURES_SUFFIX)
 
     def load_interactions_json(self):
-        with open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_interactions.json")), 'r') as interaction_file:
-            data = json.load(interaction_file)
-        return data
+        return self.load_json(INTERACTIONS_SUFFIX)
+
+    def load_json(self, json_suffix):
+        absolute_filename = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + json_suffix))
+
+        # Check if the JSON file exists and if not, generate it
+        if not os.path.isfile(absolute_filename):
+            if json_suffix == SUMMARY_SUFFIX:
+                self.generate_summary_json()
+            elif json_suffix == FEATURES_SUFFIX:
+                self.generate_features_json()
+            elif json_suffix == INTERACTIONS_SUFFIX:
+                self.generate_interactions_json()
+
+        # Read serialized JSON file
+        with open(absolute_filename, 'r') as serialized_file:
+            json_str = serialized_file.read()
+            deserialized_json = jsonpickle.decode(json_str)
+        return deserialized_json
 
 
