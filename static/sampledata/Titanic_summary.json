@@ -1,1 +1,1 @@
-"{\"numrecords\": 800, \"summary\": [{\"name\": \"Total # records\", \"value\": 891}, {\"name\": \"Records with no missing data\", \"value\": 500}, {\"name\": \"Records with 1 column missing data\", \"value\": 132}]}"
+{"numrecords": 891, "py/object": "DataSummary.DataSummary", "name": "Titanic"}

@@ -3,18 +3,15 @@
 
 <!--Data set title-->
 <h3>Data set: {{ data.name }}</h3>
-<!--<p>{{ data.numrecords }}</p>-->
 
 <!-- Summary stats about the data set -->
 <div class="table-responsive">
 <table class="table table-striped">
   <tbody>
-  {% for row in data.summary %}
     <tr>
-        <td>{{ row.name }}</td>
-        <td>{{ row.value }}</td>
+        <td>Number of records</td>
+        <td>{{ data.numrecords }}</td>
     </tr>
-  {% endfor %}
   </tbody>
 </table>
 </div>

@@ -1,16 +1,17 @@
 from flask import Flask
-from flask import render_template, session
+from flask import render_template
 from dataexp_flask import DataExplorer
 from data_driver import DataDriver
-import paths, key
-import os, json
+import paths
+import key
+import os
 
 app = Flask(__name__)
 
 # Path information
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
-app.secret_key = key.SECRET_KEY;
+app.secret_key = key.SECRET_KEY
 
 
 @app.route('/')
@@ -20,12 +21,14 @@ def index():
     driver = DataDriver("titanic.csv", "Titanic")
 
     # Get the JSON for the summary data
-    data_json = json.loads(driver.load_summary_json())
+    summary_json = driver.load_summary_json()
 
-    return render_template('index.html', data=data_json)
+    return render_template('index.html', data=summary_json)
+
 
 def datasetselected():
     return None
+
 
 @app.route('/features')
 def features():
@@ -35,18 +38,19 @@ def features():
                              "Titanic (Kaggle)")
 
     data = {'name': datastats.get_title(),
-            'headers' : datastats.get_headers_numeric(),
+            'headers': datastats.get_headers_numeric(),
             'headerscat': datastats.get_headers_nonnumeric(),
-            'statslist' : datastats.get_stats_numeric(),
-            'statslistcat' : datastats.get_stats_nonnumeric()
+            'statslist': datastats.get_stats_numeric(),
+            'statslistcat': datastats.get_stats_nonnumeric()
             }
 
-    plot = {'url' : os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.png")}
+    plot = {'url': os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.png")}
 
     hist_src = datastats.get_histograms_numeric()
-    hist = {'hist_urls' : hist_src}
+    hist = {'hist_urls': hist_src}
 
     return render_template('features.html', data=data, plot=plot, hist=hist)
+
 
 @app.route('/interactions')
 def interactions():
