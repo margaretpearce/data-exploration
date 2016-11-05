@@ -18,9 +18,10 @@ app.secret_key = key.SECRET_KEY
 @app.route('/index')
 def index():
     # Read Titanic data
-    driver = DataDriver("titanic.csv", "Titanic")
+    driver = DataDriver("titanic.csv", "Titanic", "PassengerId", "Survived")
 
     # Get the JSON for the summary data
+    driver.generate_summary_json() # TODO: Remove after testing
     summary_json = driver.load_summary_json()
 
     return render_template('index.html', data=summary_json)

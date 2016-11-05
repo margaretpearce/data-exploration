@@ -37,10 +37,31 @@ class DataDriver:
         # Get summary stats about the data and serialize it as JSON
         num_records = self.data.shape[0]
         num_features = self.data.shape[1]
-        num_rows_no_missing = self.data.copy().dropna().shape[0]
 
-        summary = DataSummary(self.title, numrecords=num_records, numfeatures=num_features,
-                              rows_no_missing=num_rows_no_missing)
+        # Count the number of columns missing for each row
+        count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis = 1)
+        self.data["num_missing"] = pd.Series(count_missing)
+
+        num_rows_no_missing = int(sum(self.data["num_missing"] == 0))
+        num_rows_one_missing = int(sum(self.data["num_missing"] == 1))
+        num_rows_two_missing = int(sum(self.data["num_missing"] == 2))
+        num_rows_three_more_missing = int(sum(self.data["num_missing"] >= 3))
+
+        # Sample data (five rows)
+        features_list = list(self.data.columns.values)
+        sample_list = self.data.head()[features_list].values.tolist()
+        # sample_list = None
+
+        summary = DataSummary(self.title,
+                              num_records=num_records,
+                              num_features=num_features,
+                              rows_no_missing=num_rows_no_missing,
+                              rows_one_missing=num_rows_one_missing,
+                              rows_two_missing=num_rows_two_missing,
+                              rows_three_more_missing=num_rows_three_more_missing,
+                              features_list=features_list,
+                              sample_list=sample_list
+                              )
         summary_json = jsonpickle.encode(summary)
 
         # Save the serialized JSON to a file
