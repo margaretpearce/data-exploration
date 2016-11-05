@@ -1,1 +1,1 @@
-{"numrecords": 891, "py/object": "DataSummary.DataSummary", "name": "Titanic"}
+{"numrecords": 891, "rows_no_missing": 183, "name": "Titanic", "numfeatures": 12, "py/object": "DataSummary.DataSummary"}

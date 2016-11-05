@@ -35,11 +35,16 @@ class DataDriver:
 
     def generate_summary_json(self):
         # Get summary stats about the data and serialize it as JSON
-        summary = DataSummary(self.title, self.data.shape[0])
+        num_records = self.data.shape[0]
+        num_features = self.data.shape[1]
+        num_rows_no_missing = self.data.copy().dropna().shape[0]
+
+        summary = DataSummary(self.title, numrecords=num_records, numfeatures=num_features,
+                              rows_no_missing=num_rows_no_missing)
         summary_json = jsonpickle.encode(summary)
 
         # Save the serialized JSON to a file
-        file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_summary.json")), 'w')
+        file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + SUMMARY_SUFFIX)), 'w')
         file.write(summary_json)
         file.close()
 
