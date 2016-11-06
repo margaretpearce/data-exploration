@@ -50,6 +50,7 @@
 </div>
 
 <!-- Histograms -->
+<h4>Histograms</h4>
 <div class="table-responsive">
 <table class="table table-striped">
   <thead>
@@ -63,6 +64,27 @@
     <tr>
         <td>{{ key }}</td>
         <td><img src="{{ hist.hist_urls[key] }}" /></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<!-- Count plots -->
+<h4>Count Plots</h4>
+<div class="table-responsive">
+<table class="table table-striped">
+  <thead>
+    <tr>
+        <td>Feature</td>
+        <td>Count plot</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for key in cplots.countplots_url.keys() %}
+    <tr>
+        <td>{{ key }}</td>
+        <td><img src="{{ cplots.countplots_url[key] }}" /></td>
     </tr>
   {% endfor %}
   </tbody>

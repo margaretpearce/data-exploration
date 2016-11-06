@@ -50,7 +50,10 @@ def features():
     hist_src = datastats.get_histograms_numeric()
     hist = {'hist_urls': hist_src}
 
-    return render_template('features.html', data=data, plot=plot, hist=hist)
+    countplots_src = datastats.get_countplots_nonnumeric()
+    countplots = {'countplots_url': countplots_src}
+
+    return render_template('features.html', data=data, plot=plot, hist=hist, cplots=countplots)
 
 
 @app.route('/interactions')

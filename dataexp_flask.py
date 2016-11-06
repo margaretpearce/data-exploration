@@ -95,6 +95,25 @@ class DataExplorer:
             hist[feature] = paths.EXAMPLES_RELATIVE + str(feature + "_hist.png")
         return hist
 
+    def get_countplots_nonnumeric(self):
+        countplots = {}
+        for feature in self.nonnumeric_fieldnames:
+            # Generate the count plot
+            feature_data = self.data[feature].dropna()
+            countplot = sns.countplot(y=feature_data)
+
+            # Save the histogram
+            full_url = os.path.join(paths.EXAMPLES_FOLDER, str(feature + "_countplot.png"))
+            fig = countplot.get_figure()
+            fig.savefig(full_url)
+
+            # Clear the figure to prepare for the next plot
+            sns.plt.clf()
+
+            # Return the relative URL to the histogram
+            countplots[feature] = paths.EXAMPLES_RELATIVE + str(feature + "_countplot.png")
+        return countplots
+
     def get_summary(self):
         return zip(self.get_summary_headers(), self.get_summary_stats())
 
