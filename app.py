@@ -31,8 +31,8 @@ def datasetselected():
     return None
 
 
-@app.route('/features')
-def features():
+@app.route('/univariate')
+def univariate():
     datastats = DataExplorer(os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.csv"),
                              "PassengerId",
                              "Survived",
@@ -53,11 +53,11 @@ def features():
     countplots_src = datastats.get_countplots_nonnumeric()
     countplots = {'countplots_url': countplots_src}
 
-    return render_template('features.html', data=data, plot=plot, hist=hist, cplots=countplots)
+    return render_template('univariate.html', data=data, plot=plot, hist=hist, cplots=countplots)
 
 
-@app.route('/interactions')
-def interactions():
+@app.route('/bivariate')
+def bivariate():
     # Read Titanic data
     driver = DataDriver("titanic.csv", "Titanic", "PassengerId", "Survived")
 
@@ -65,4 +65,4 @@ def interactions():
     driver.generate_interactions_json() # TODO: Remove after testing
     interactions_json = driver.load_interactions_json()
 
-    return render_template('interactions.html', interactions=interactions_json)
+    return render_template('bivariate.html', interactions=interactions_json)

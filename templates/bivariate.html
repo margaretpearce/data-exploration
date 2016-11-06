@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Bi-variate Analysis</h3>
+
+<!-- Pick two variables. Select the label by default -->
+
+<!-- Continuous and continuous: scatter plot, correlation, covariance -->
+<!-- Categorical and categorical: stacked column chart (y=# occur, x=var 1, color=var 2), chi-square,
+    cramer's v (nominal), mantel-haenszed chi-squared (ordinal) -->
+<!-- Mix: Box plots (x=categorical, y=continuous), z-test, t-test, anova
+
+<!-- All variables -->
+<h4>Correlations</h4>
+<img src="{{ interactions.correlations_url }}">
+
+<h4>Covariance</h4>
+<img src="{{ interactions.covariance_url }}">
+
+
+{% endblock %}

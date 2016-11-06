@@ -1,1 +1,1 @@
-{"name": "Titanic", "covariance_url": "static/sampledata/Titanic_cov.png", "py/object": "Interactions.Interactions", "correlations_url": "static/sampledata/Titanic_corr.png"}
+{"covariance_url": "static/sampledata/Titanic_cov.png", "py/object": "Interactions.Interactions", "name": "Titanic", "correlations_url": "static/sampledata/Titanic_corr.png"}

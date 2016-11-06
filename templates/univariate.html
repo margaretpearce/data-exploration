@@ -2,10 +2,50 @@
 {% block content %}
 
 <!--Data set title-->
-<h3>Features</h3>
+<h3>Univariate Analysis</h3>
+
+<!-- Toggle between variables -->
+<select>
+    <option>ID</option>
+    <option>Passenger Name</option>
+    <option>...</option>
+</select>
+
+<!-- Table with stats -->
+<div>
+  <table>
+      <tr>
+          <td>Mean</td>
+          <td>Val</td>
+      </tr>
+      <tr>
+          <td>Median</td>
+          <td>Val</td>
+      </tr>
+      <tr>
+          <td>Mode</td>
+          <td>Val</td>
+      </tr>
+      <tr>
+          <td>Min</td>
+          <td>Val</td>
+      </tr>
+      <tr>
+          <td>Max</td>
+          <td>Val</td>
+      </tr>
+      <!-- range, quartile, IQR, variance, std dev, skewness and kurtosis -->
+      <!-- outliers -->
+  </table>
+</div>
+
+<div>
+    <!-- Histogram -->
+    <!-- Box plot -->
+</div>
 
 <!-- Summary statistics organized in a table-->
-<h4>Numeric</h4>
+<h4>Continuous variables</h4>
 <div class="table-responsive">
 <table class="table table-striped">
   <thead>
@@ -27,7 +67,7 @@
 </table>
 </div>
 
-<h4>Non-numeric</h4>
+<h4>Categorical variables</h4>
 <div class="table-responsive">
 <table class="table table-striped">
   <thead>
