@@ -46,7 +46,6 @@ class DataExplorer:
 
     def get_stats_nonnumeric(self):
         data_count = list(map(lambda x: self.nonnumeric_data[x].count(), self.nonnumeric_fieldnames))
-        # data_missing = list(map(lambda x: self.nonnumeric_data[x].isnull().sum(), self.nonnumeric_fieldnames))
         data_missing = list(map(lambda x: str("%s (%.3f%%)" %
                             (self.nonnumeric_data[x].isnull().sum(),
                             100 * (self.nonnumeric_data[x].isnull().sum() / float(len(self.nonnumeric_data[x]))))),
@@ -101,6 +100,13 @@ class DataExplorer:
             # Generate the count plot
             feature_data = self.data[feature].dropna()
             countplot = sns.countplot(y=feature_data)
+
+            # TODO: Fix displaying too many points on y-axis
+            if (len(feature_data.unique()) / float(feature_data.count())) > 0.5:
+                print("remove y labels for %s" % feature)
+                countplot.set(ylabel='')
+                countplot.set(yticklabels=[])
+                countplot.yaxis.set_visible(False)
 
             # Save the histogram
             full_url = os.path.join(paths.EXAMPLES_FOLDER, str(feature + "_countplot.png"))
