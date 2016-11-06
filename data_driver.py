@@ -2,7 +2,9 @@ import pandas as pd
 import os
 import jsonpickle
 import paths
+import seaborn as sns
 from Summary import DataSummary
+from Interactions import Interactions
 
 SUMMARY_SUFFIX = "_summary.json"
 FEATURES_SUFFIX = "_features.json"
@@ -22,6 +24,12 @@ class DataDriver:
         # Check if the data file exists, and if so, load the data
         if os.path.isfile(self.filepath):
             self.load_data()
+
+        self.numeric_data = self.data.select_dtypes(include=['int64', 'float64'])
+        self.numeric_fieldnames = list(self.numeric_data.columns.values)
+        if self.id_column in self.numeric_fieldnames:
+            self.numeric_fieldnames.remove(self.id_column)
+
 
     def load_data(self):
         # Load the data into a Pandas DataFrame
@@ -52,7 +60,7 @@ class DataDriver:
         features_list = list(self.data.columns.values)
         sample_list = self.data.head()[features_list].values.tolist()
 
-        summary = DataSummary(self.title,
+        summary = DataSummary(name=self.title,
                               num_records=num_records,
                               num_features=num_features,
                               index_column=index_column,
@@ -75,7 +83,38 @@ class DataDriver:
         return None
 
     def generate_interactions_json(self):
-        return None
+        # Get correlations between features
+        correlations = self.numeric_data.corr()
+        correlation_heatmap = sns.heatmap(correlations, vmax=1, square=True)
+
+        # Save the heatmap
+        correlation_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_corr.png"))
+        correlation_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_corr.png")
+        fig = correlation_heatmap.get_figure()
+        fig.savefig(correlation_url)
+
+        # Clear the figure to prepare for the next plot
+        sns.plt.clf()
+
+        # Get covariance between features
+        covariance = self.data.cov()
+        covariance_heatmap = sns.heatmap(covariance, vmax=1, square=True)
+        covariance_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_cov.png"))
+        covariance_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_cov.png")
+        fig = covariance_heatmap.get_figure()
+        fig.savefig(covariance_url)
+        sns.plt.clf()
+
+        # Save data as JSON
+        interactions = Interactions(name=self.title,
+                                    correlations_url=correlation_url_relative,
+                                    covariance_url=covariance_url_relative)
+        interactions_json = jsonpickle.encode(interactions)
+
+        # Save the serialized JSON to a file
+        file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + INTERACTIONS_SUFFIX)), 'w')
+        file.write(interactions_json)
+        file.close()
 
     def load_summary_json(self):
         return self.load_json(SUMMARY_SUFFIX)

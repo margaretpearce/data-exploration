@@ -55,4 +55,11 @@ def features():
 
 @app.route('/interactions')
 def interactions():
-    return render_template('interactions.html')
+    # Read Titanic data
+    driver = DataDriver("titanic.csv", "Titanic", "PassengerId", "Survived")
+
+    # Get the JSON for the summary data
+    driver.generate_interactions_json() # TODO: Remove after testing
+    interactions_json = driver.load_interactions_json()
+
+    return render_template('interactions.html', interactions=interactions_json)
