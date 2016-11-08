@@ -8,29 +8,24 @@
 
 <div class="container dataset-menu">
         <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
-            <select class="custom-dropdown__select custom-dropdown__select--white">
+            <select id="feature_selector" class="custom-dropdown__select custom-dropdown__select--white">
                 {% for f in mydata.features %}
-                <option>{{ f.feat_name }}</option>
+                <option value="{{ f.feat_index }}">{{ f.feat_name }}</option>
                 {% endfor %}
             </select>
         </span>
 </div>
 
-<!--
-<select>
-    <option>ID</option>
-    <option>Passenger Name</option>
-    <option>...</option>
-</select>-->
-
 <!-- Table with stats -->
 {% for f in mydata.features %}
+<div id="feature-{{ f.feat_index }}" class="feature-tables table-hidden">
+<h4>{{ f.feat_name }}</h4>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
         <tr>
             <th rowspan="2">
-                {{ f.feat_name }}
+                Overview
             </th>
         </tr>
         </thead>
@@ -54,11 +49,23 @@
             <td># Unique</td>
             <td>{{ f.feat_unique }}</td>
         </tr>
+        </table>
+</div>
 
-        <!-- Numeric fields only -->
+<!-- Numeric fields only -->
+{% if f.feat_average %}
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th rowspan="2">
+                Central tendency
+            </th>
+        </tr>
+        </thead>
         {% if f.feat_average %}
         <tr>
-            <td>Average</td>
+            <td>Mean</td>
             <td>{{ f.feat_average }}</td>
         </tr>
         {% endif %}
@@ -66,6 +73,12 @@
         <tr>
             <td>Median</td>
             <td>{{ f.feat_median }}</td>
+        </tr>
+        {% endif %}
+        {% if f.feat_mode %}
+        <tr>
+            <td>Mode</td>
+            <td>{{ f.feat_mode }}</td>
         </tr>
         {% endif %}
         {% if f.feat_max %}
@@ -80,6 +93,19 @@
             <td>{{ f.feat_min }}</td>
         </tr>
         {% endif %}
+        </table>
+</div>
+{% endif %}
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th rowspan="2">
+                Distribution
+            </th>
+        </tr>
+        </thead>
         {% if f.feat_stddev %}
         <tr>
             <td>Standard deviation</td>
@@ -90,6 +116,18 @@
         <tr>
             <td>Variance</td>
             <td>{{ f.feat_variance }}</td>
+        </tr>
+        {% endif %}
+        {% if f.feat_quantile_25 %}
+        <tr>
+            <td>25%</td>
+            <td>{{ f.feat_quantile_25 }}</td>
+        </tr>
+        {% endif %}
+        {% if f.feat_quantile_75 %}
+        <tr>
+            <td>75%</td>
+            <td>{{ f.feat_quantile_75 }}</td>
         </tr>
         {% endif %}
 
@@ -112,98 +150,68 @@
     </table>
 </div>
 <br/>
+</div>
 {% endfor %}
 
-<div>
+<div id="graphs">
+    {% for f in mydata.features %}
+        <div id="graph-{{ f.feat_index }}" class="feature-graphs table-hidden">
+            {% if f.graph_histogram %}
+            <h4>Histogram</h4>
+            <img src="{{ f.graph_histogram }}" />
+            {% endif %}
+
+            {% if f.graph_countplot %}
+            <h4>Count plot</h4>
+            <img src="{{ f.graph_countplot }}" />
+            {% endif %}
+        </div>
+    {% endfor %}
     <!-- Histogram -->
     <!-- Box plot -->
 </div>
 
-<!-- Summary statistics organized in a table-->
-<h4>Continuous variables</h4>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            {% for h in data.headers %}
-            <th>{{ h }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in data.statslist %}
-        <tr>
-            {% for val in row %}
-            <td>{{ val }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-<h4>Categorical variables</h4>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            {% for h in data.headerscat %}
-            <th>{{ h }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in data.statslistcat %}
-        <tr>
-            {% for val in row %}
-            <td>{{ val }}</td>
-            {% endfor %}
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+<!--&lt;!&ndash; Histograms &ndash;&gt;-->
+<!--<h4>Histograms</h4>-->
+<!--<div class="table-responsive">-->
+    <!--<table class="table table-striped">-->
+        <!--<thead>-->
+        <!--<tr>-->
+            <!--<td>Feature</td>-->
+            <!--<td>Histogram</td>-->
+        <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+        <!--{% for key in hist.hist_urls.keys() %}-->
+        <!--<tr>-->
+            <!--<td>{{ key }}</td>-->
+            <!--<td><img src="{{ hist.hist_urls[key] }}" /></td>-->
+        <!--</tr>-->
+        <!--{% endfor %}-->
+        <!--</tbody>-->
+    <!--</table>-->
+<!--</div>-->
 
-<!-- Histograms -->
-<h4>Histograms</h4>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <td>Feature</td>
-            <td>Histogram</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for key in hist.hist_urls.keys() %}
-        <tr>
-            <td>{{ key }}</td>
-            <td><img src="{{ hist.hist_urls[key] }}" /></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Count plots -->
-<h4>Count Plots</h4>
-<div class="table-responsive">
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <td>Feature</td>
-            <td>Count plot</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for key in cplots.countplots_url.keys() %}
-        <tr>
-            <td>{{ key }}</td>
-            <td><img src="{{ cplots.countplots_url[key] }}" /></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+<!--&lt;!&ndash; Count plots &ndash;&gt;-->
+<!--<h4>Count Plots</h4>-->
+<!--<div class="table-responsive">-->
+    <!--<table class="table table-striped">-->
+        <!--<thead>-->
+        <!--<tr>-->
+            <!--<td>Feature</td>-->
+            <!--<td>Count plot</td>-->
+        <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+        <!--{% for key in cplots.countplots_url.keys() %}-->
+        <!--<tr>-->
+            <!--<td>{{ key }}</td>-->
+            <!--<td><img src="{{ cplots.countplots_url[key] }}" /></td>-->
+        <!--</tr>-->
+        <!--{% endfor %}-->
+        <!--</tbody>-->
+    <!--</table>-->
+<!--</div>-->
 
 {% endblock %}

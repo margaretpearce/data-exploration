@@ -38,15 +38,6 @@ def univariate():
                              "Survived",
                              "Titanic (Kaggle)")
 
-    data = {'name': datastats.get_title(),
-            'headers': datastats.get_headers_numeric(),
-            'headerscat': datastats.get_headers_nonnumeric(),
-            'statslist': datastats.get_stats_numeric(),
-            'statslistcat': datastats.get_stats_nonnumeric()
-            }
-
-    plot = {'url': os.path.join(app.config['EXAMPLES_FOLDER'], "titanic.png")}
-
     hist_src = datastats.get_histograms_numeric()
     hist = {'hist_urls': hist_src}
 
@@ -61,7 +52,7 @@ def univariate():
     driver.generate_features_json() # TODO: Remove after testing
     features_json = driver.load_features_json()
 
-    return render_template('univariate.html', data=data, plot=plot, hist=hist, cplots=countplots, mydata=features_json)
+    return render_template('univariate.html', hist=hist, cplots=countplots, mydata=features_json)
 
 
 @app.route('/bivariate')

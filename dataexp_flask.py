@@ -101,7 +101,6 @@ class DataExplorer:
             feature_data = self.data[feature].dropna()
             countplot = sns.countplot(y=feature_data)
 
-            # TODO: Fix displaying too many points on y-axis
             if (len(feature_data.unique()) / float(feature_data.count())) > 0.5:
                 print("remove y labels for %s" % feature)
                 countplot.set(ylabel='')

@@ -100,5 +100,30 @@
 <script type="text/javascript" src="./static/js/jquery.fileupload-process.js"></script>
 <script type="text/javascript" src="./static/js/jquery.fileupload-ui.js"></script>
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        // Show the default selected field
+        selected_feat_id = $('#feature_selector').find(":selected").val()
+        feat_id = "#feature-" + selected_feat_id;
+        graph_id = "#graph-" + selected_feat_id;
+        $(feat_id).removeClass('table-hidden');
+        $(graph_id).removeClass('table-hidden');
+
+        // Respond to changing the selected feature
+        $('select').on('change', function() {
+            // Hide all tables
+            $('.feature-tables').addClass('table-hidden');
+            $('.feature-graphs').addClass('table-hidden');
+
+            // Show the tables for the selected field
+            feat_id = "#feature-" + $(this).val();
+            graph_id = "#graph-" + $(this).val();
+            $(feat_id).removeClass('table-hidden');
+            $(graph_id).removeClass('table-hidden');
+        });
+    });
+
+</script>
+
 </body>
 </html>

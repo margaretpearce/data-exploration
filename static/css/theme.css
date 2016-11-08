@@ -89,6 +89,25 @@ body {
 	border: 1px solid grey;
 }
 
+.table-hidden {
+	display: none;
+}
+
+.feature-tables {
+	float: left;
+	width: 50%;
+}
+
+.feature-graphs {
+	float: right;
+	width: 50%;
+}
+
+.feature-graphs img {
+	width: 100%;
+	height: 100%;
+}
+
 /*  Custom dropdown style from: Red Team Design
     Thank you!
     http://red-team-design.com/making-html-dropdowns-not-suck/ */

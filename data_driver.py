@@ -83,35 +83,72 @@ class DataDriver:
 
     def generate_features_json(self):
         features_collection = []
+        feature_index = 0
 
         # For each feature, get as much relevant info as possible
         for var_name in self.data.columns.values:
             # Common for all field types
-            var_type = str(self.data[var_name].dtype)
+            var_type = None
+            raw_type = str(self.data[var_name].dtype)
+
+            if raw_type == "int64":
+                # Check if it's really a boolean
+                unique_vals = self.data[var_name].unique()
+                for val in unique_vals:
+                    if not (int(val)==0 or int(val)==1):
+                        var_type = "Integer"
+                if not var_type == "Integer":
+                    var_type = "Boolean"
+            elif raw_type == "float64":
+                var_type = "Float"
+            elif raw_type == "datetime64":
+                var_type = "Date"
+            elif raw_type == "object":
+                var_type = "String"
+
             var_count = int(self.data[var_name].count())
-            var_missing = int(self.data[var_name].isnull().sum())
+
+            missing_count = int(self.data[var_name].isnull().sum())
+            missing_percent = missing_count / float(var_count)
+            var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
+
             var_unique = int(len(self.data[var_name].unique()))
 
             # Numeric only
             var_avg = None
             var_median = None
+            var_mode = None
             var_max = None
             var_min = None
             var_stddev = None
             var_variance = None
+            var_quantile25 = None
+            var_quantile75 = None
 
             # Non-numeric only
             var_mostcommon = None
             var_leastcommon = None
 
+            # Graphs
+            graph_histogram = None
+            graph_countplot = None
+
             # Compute numeric statistics
             if self.data[var_name].dtype in ['int64', 'float64']:
-                var_avg = float(self.data[var_name].mean())
+                var_avg = str("%.3f" % float(self.data[var_name].mean()))
                 var_median = float(self.data[var_name].median())
                 var_max = float(self.data[var_name].max())
                 var_min = float(self.data[var_name].min())
-                var_stddev = float(self.data[var_name].std())
-                var_variance = float(self.data[var_name].var())
+                var_stddev = str("%.3f" % self.data[var_name].std())
+                var_variance = str("%.3f" % self.data[var_name].var())
+                var_quantile25 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.25))
+                var_quantile75 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.75))
+
+                mode = self.data[var_name].mode()
+                if not mode is None:
+                    var_mode = ""
+                    for m in mode:
+                        var_mode = var_mode + str(m)
 
             # Compute non-numeric stats
             else:
@@ -122,20 +159,51 @@ class DataDriver:
                                      (self.data[var_name].value_counts().idxmin(),
                                      self.data[var_name].value_counts().min()))
 
+            # Histogram/ countplot
+            if self.data[var_name].dtype in ['int64', 'float64']:
+                hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
+                full_url = os.path.join(paths.EXAMPLES_FOLDER, str(var_name + "_hist.png"))
+                fig = hist_plot.get_figure()
+                fig.savefig(full_url)   # Save the histogram
+                sns.plt.clf()   # Clear the figure to prepare for the next plot
+                graph_histogram = paths.EXAMPLES_RELATIVE + str(var_name + "_hist.png")    # Relative histogram URL
+            else:
+                countplot = sns.countplot(y=self.data[var_name].dropna())
+
+                if (var_unique / float(var_count)) > 0.5:
+                    countplot.set(ylabel='')
+                    countplot.set(yticklabels=[])
+                    countplot.yaxis.set_visible(False)
+
+                full_url = os.path.join(paths.EXAMPLES_FOLDER, str(var_name + "_countplot.png"))
+                fig = countplot.get_figure()
+                fig.savefig(full_url)
+                sns.plt.clf()   # Clear the figure to prepare for the next plot
+
+                # Return the relative URL to the histogram
+                graph_countplot = paths.EXAMPLES_RELATIVE + str(var_name + "_countplot.png")
+
             feature = Feature(feat_name=var_name,
+                              feat_index=feature_index,
                               feat_type=var_type,
                               feat_count=var_count,
                               feat_missing=var_missing,
                               feat_unique=var_unique,
                               feat_average=var_avg,
                               feat_median=var_median,
+                              feat_mode=var_mode,
                               feat_max=var_max,
                               feat_min=var_min,
                               feat_stddev=var_stddev,
                               feat_variance=var_variance,
+                              feat_quantile25=var_quantile25,
+                              feat_quantile75=var_quantile75,
                               feat_mostcommon=var_mostcommon,
-                              feat_leastcommon=var_leastcommon)
+                              feat_leastcommon=var_leastcommon,
+                              graph_histogram=graph_histogram,
+                              graph_countplot=graph_countplot)
             features_collection.append(feature)
+            feature_index = feature_index + 1
 
         # Create object holding features collection and save as JSON
         features = Features(self.title, features_collection)
