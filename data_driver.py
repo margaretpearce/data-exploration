@@ -5,10 +5,13 @@ import paths
 import seaborn as sns
 from Summary import DataSummary
 from Interactions import Interactions
+from Feature import Feature
+from Features import Features
 
 SUMMARY_SUFFIX = "_summary.json"
 FEATURES_SUFFIX = "_features.json"
 INTERACTIONS_SUFFIX = "_interactions.json"
+
 
 class DataDriver:
     def __init__(self, datafile, title, idcolumn=None, labelcolumn=None):
@@ -30,7 +33,6 @@ class DataDriver:
         if self.id_column in self.numeric_fieldnames:
             self.numeric_fieldnames.remove(self.id_column)
 
-
     def load_data(self):
         # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
@@ -48,7 +50,7 @@ class DataDriver:
         label_column = self.label_column
 
         # Count the number of columns missing for each row
-        count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis = 1)
+        count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis=1)
         self.data["num_missing"] = pd.Series(count_missing)
 
         num_rows_no_missing = int(sum(self.data["num_missing"] == 0))
@@ -80,7 +82,69 @@ class DataDriver:
         file.close()
 
     def generate_features_json(self):
-        return None
+        features_collection = []
+
+        # For each feature, get as much relevant info as possible
+        for var_name in self.data.columns.values:
+            # Common for all field types
+            var_type = str(self.data[var_name].dtype)
+            var_count = int(self.data[var_name].count())
+            var_missing = int(self.data[var_name].isnull().sum())
+            var_unique = int(len(self.data[var_name].unique()))
+
+            # Numeric only
+            var_avg = None
+            var_median = None
+            var_max = None
+            var_min = None
+            var_stddev = None
+            var_variance = None
+
+            # Non-numeric only
+            var_mostcommon = None
+            var_leastcommon = None
+
+            # Compute numeric statistics
+            if self.data[var_name].dtype in ['int64', 'float64']:
+                var_avg = float(self.data[var_name].mean())
+                var_median = float(self.data[var_name].median())
+                var_max = float(self.data[var_name].max())
+                var_min = float(self.data[var_name].min())
+                var_stddev = float(self.data[var_name].std())
+                var_variance = float(self.data[var_name].var())
+
+            # Compute non-numeric stats
+            else:
+                var_mostcommon = str("%s (%d)" %
+                                     (self.data[var_name].value_counts().idxmax(),
+                                     self.data[var_name].value_counts().max()))
+                var_leastcommon = str("%s (%d)" %
+                                     (self.data[var_name].value_counts().idxmin(),
+                                     self.data[var_name].value_counts().min()))
+
+            feature = Feature(feat_name=var_name,
+                              feat_type=var_type,
+                              feat_count=var_count,
+                              feat_missing=var_missing,
+                              feat_unique=var_unique,
+                              feat_average=var_avg,
+                              feat_median=var_median,
+                              feat_max=var_max,
+                              feat_min=var_min,
+                              feat_stddev=var_stddev,
+                              feat_variance=var_variance,
+                              feat_mostcommon=var_mostcommon,
+                              feat_leastcommon=var_leastcommon)
+            features_collection.append(feature)
+
+        # Create object holding features collection and save as JSON
+        features = Features(self.title, features_collection)
+        features_json = jsonpickle.encode(features)
+
+        # Save the serialized JSON to a file
+        file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + FEATURES_SUFFIX)), 'w')
+        file.write(features_json)
+        file.close()
 
     def generate_interactions_json(self):
         # Get correlations between features
@@ -142,5 +206,6 @@ class DataDriver:
             json_str = serialized_file.read()
             deserialized_json = jsonpickle.decode(json_str)
         return deserialized_json
+
 
 

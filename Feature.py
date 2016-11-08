@@ -1,6 +1,7 @@
-class Features(object):
-    def __init__(self, feat_name, feat_type, feat_count, feat_missing, feat_unique, feat_average, feat_median,
-                 feat_max, feat_min, feat_stddev, feat_variance, feat_mostcommon, feat_leastcommon, graph_hist):
+class Feature(object):
+    def __init__(self, feat_name, feat_type, feat_count, feat_missing, feat_unique=None, feat_average=None,
+                 feat_median=None, feat_max=None, feat_min=None, feat_stddev=None, feat_variance=None,
+                 feat_mostcommon=None, feat_leastcommon=None, graph_hist=None):
         # Feature stats
         self.feat_name = feat_name
         self.feat_type = feat_type

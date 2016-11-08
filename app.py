@@ -53,7 +53,15 @@ def univariate():
     countplots_src = datastats.get_countplots_nonnumeric()
     countplots = {'countplots_url': countplots_src}
 
-    return render_template('univariate.html', data=data, plot=plot, hist=hist, cplots=countplots)
+
+    # Read Titanic data
+    driver = DataDriver("titanic.csv", "Titanic", "PassengerId", "Survived")
+
+    # Get the JSON for the summary data
+    driver.generate_features_json() # TODO: Remove after testing
+    features_json = driver.load_features_json()
+
+    return render_template('univariate.html', data=data, plot=plot, hist=hist, cplots=countplots, mydata=features_json)
 
 
 @app.route('/bivariate')
