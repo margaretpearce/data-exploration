@@ -5,11 +5,23 @@
 <h3>Univariate Analysis</h3>
 
 <!-- Toggle between variables -->
+
+<div class="container dataset-menu">
+        <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
+            <select class="custom-dropdown__select custom-dropdown__select--white">
+                {% for f in mydata.features %}
+                <option>{{ f.feat_name }}</option>
+                {% endfor %}
+            </select>
+        </span>
+</div>
+
+<!--
 <select>
     <option>ID</option>
     <option>Passenger Name</option>
     <option>...</option>
-</select>
+</select>-->
 
 <!-- Table with stats -->
 {% for f in mydata.features %}

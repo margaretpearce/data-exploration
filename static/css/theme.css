@@ -75,6 +75,20 @@ body {
     border-radius: 0px;
 }
 
+/*  Navigation tabs */
+.navbar-default .navbar-nav > .active > a:focus {
+  color: #555;
+  background-color: #e7e7e7;
+}
+
+.active-tab {
+	background-color: #ffffff !important;
+}
+
+.custom-dropdown--border {
+	border: 1px solid grey;
+}
+
 /*  Custom dropdown style from: Red Team Design
     Thank you!
     http://red-team-design.com/making-html-dropdowns-not-suck/ */
