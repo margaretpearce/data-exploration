@@ -3,19 +3,51 @@
 
 <h3>Bi-variate Analysis</h3>
 
-<!-- Pick two variables. Select the label by default -->
+<!-- Pick a variable. Select the label by default -->
+<div class="container dataset-menu">
+        <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
+            <select id="interaction_selector" class="custom-dropdown__select custom-dropdown__select--white">
+                {% for f in data.features %}
+                <option value="{{ f.feat_index }}">{{ f.feat_name }}</option>
+                {% endfor %}
+            </select>
+        </span>
+</div>
 
-<!-- Continuous and continuous: scatter plot, correlation, covariance -->
-<!-- Categorical and categorical: stacked column chart (y=# occur, x=var 1, color=var 2), chi-square,
-    cramer's v (nominal), mantel-haenszed chi-squared (ordinal) -->
-<!-- Mix: Box plots (x=categorical, y=continuous), z-test, t-test, anova
-
-<!-- All variables -->
-<h4>Correlations</h4>
-<img src="{{ interactions.correlations_url }}">
-
-<h4>Covariance</h4>
-<img src="{{ interactions.covariance_url }}">
-
+<!-- Table with stats -->
+{% for f in data.feature_interactions.keys() %}
+<div id="interactions-{{ f.feat_index }}" class="interactions-tables">
+    <h4>{{ data.feature_interactions[f].feat_name }}</h4>
+    {% if data.feature_interactions[f].correlations %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>
+                    Feature name
+                </th>
+                <th>
+                    Correlation with {{ data.feature_interactions[f].feat_name }}
+                </th>
+                <th>
+                    Covariance with {{ data.feature_interactions[f].feat_name }}
+                </th>
+            </tr>
+            </thead>
+            {% for i in data.feature_interactions[f].other_features %}
+                {% if data.feature_interactions[f].correlations[i] %}
+                <tr>
+                    <td>{{ i }}</td>
+                    <td>{{ data.feature_interactions[f].correlations[i] }}</td>
+                    <td>{{ data.feature_interactions[f].covariances[i] }}</td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+    <br/>
+</div>
+{% endfor %}
 
 {% endblock %}

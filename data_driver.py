@@ -5,6 +5,7 @@ import paths
 import seaborn as sns
 from Summary import DataSummary
 from Interactions import Interactions
+from Interaction import Interaction
 from Feature import Feature
 from Features import Features
 
@@ -27,11 +28,6 @@ class DataDriver:
         # Check if the data file exists, and if so, load the data
         if os.path.isfile(self.filepath):
             self.load_data()
-
-        self.numeric_data = self.data.select_dtypes(include=['int64', 'float64'])
-        self.numeric_fieldnames = list(self.numeric_data.columns.values)
-        if self.id_column in self.numeric_fieldnames:
-            self.numeric_fieldnames.remove(self.id_column)
 
     def load_data(self):
         # Load the data into a Pandas DataFrame
@@ -95,7 +91,7 @@ class DataDriver:
                 # Check if it's really a boolean
                 unique_vals = self.data[var_name].unique()
                 for val in unique_vals:
-                    if not (int(val)==0 or int(val)==1):
+                    if not (int(val) == 0 or int(val) == 1):
                         var_type = "Integer"
                 if not var_type == "Integer":
                     var_type = "Boolean"
@@ -124,6 +120,9 @@ class DataDriver:
             var_variance = None
             var_quantile25 = None
             var_quantile75 = None
+            var_iqr = None
+            var_skew = None
+            var_kurtosis = None
 
             # Non-numeric only
             var_mostcommon = None
@@ -143,21 +142,25 @@ class DataDriver:
                 var_variance = str("%.3f" % self.data[var_name].var())
                 var_quantile25 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.25))
                 var_quantile75 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.75))
+                var_iqr = str("%.3f" % (self.data[var_name].dropna().quantile(q=0.75) -
+                                        self.data[var_name].dropna().quantile(q=0.25)))
+                var_skew = str("%.3f" % self.data[var_name].skew())
+                var_kurtosis = str("%.3f" % self.data[var_name].kurt())
 
                 mode = self.data[var_name].mode()
-                if not mode is None:
+                if mode is not None:
                     var_mode = ""
                     for m in mode:
-                        var_mode = var_mode + str(m)
+                        var_mode = var_mode + str(m) + " "
 
             # Compute non-numeric stats
             else:
                 var_mostcommon = str("%s (%d)" %
                                      (self.data[var_name].value_counts().idxmax(),
-                                     self.data[var_name].value_counts().max()))
+                                      self.data[var_name].value_counts().max()))
                 var_leastcommon = str("%s (%d)" %
                                      (self.data[var_name].value_counts().idxmin(),
-                                     self.data[var_name].value_counts().min()))
+                                      self.data[var_name].value_counts().min()))
 
             # Histogram/ countplot
             if self.data[var_name].dtype in ['int64', 'float64']:
@@ -198,12 +201,15 @@ class DataDriver:
                               feat_variance=var_variance,
                               feat_quantile25=var_quantile25,
                               feat_quantile75=var_quantile75,
+                              feat_iqr=var_iqr,
+                              feat_skew=var_skew,
+                              feat_kurtosis=var_kurtosis,
                               feat_mostcommon=var_mostcommon,
                               feat_leastcommon=var_leastcommon,
                               graph_histogram=graph_histogram,
                               graph_countplot=graph_countplot)
             features_collection.append(feature)
-            feature_index = feature_index + 1
+            feature_index += 1
 
         # Create object holding features collection and save as JSON
         features = Features(self.title, features_collection)
@@ -215,33 +221,131 @@ class DataDriver:
         file.close()
 
     def generate_interactions_json(self):
-        # Get correlations between features
-        correlations = self.numeric_data.corr()
-        correlation_heatmap = sns.heatmap(correlations, vmax=1, square=True)
+        interactions_collection = {}
+        features = []
 
-        # Save the heatmap
-        correlation_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_corr.png"))
-        correlation_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_corr.png")
-        fig = correlation_heatmap.get_figure()
-        fig.savefig(correlation_url)
+        feature_index = 0
+        feature_names = list(self.data.columns.values)
 
-        # Clear the figure to prepare for the next plot
-        sns.plt.clf()
+        # For each feature, get as much relevant info as possible
+        for base_feat in feature_names:
+            # Save the current feature to the collection
+            base_feature = Feature(feat_name=base_feat, feat_index=feature_index)
+            features.append(base_feature)
 
-        # Get covariance between features
-        covariance = self.data.cov()
-        covariance_heatmap = sns.heatmap(covariance, vmax=1, square=True)
-        covariance_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_cov.png"))
-        covariance_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_cov.png")
-        fig = covariance_heatmap.get_figure()
-        fig.savefig(covariance_url)
-        sns.plt.clf()
+            # Get a list of all other features
+            other_features = feature_names.copy()
+            other_features.remove(base_feat)
 
-        # Save data as JSON
+            # Create empty dictionaries to store comparisons of this field against all others
+            scatterplots={}
+            correlations={}
+            covariances={}
+            boxplots={}
+            ztests={}
+            ttests={}
+            anova={}
+            stackedbarplots={}
+            chisquared={}
+            craters={}
+            mantelhchi={}
+
+            # Compare against all other features
+            for compare_feat in other_features:
+                base_is_numeric = self.data[base_feat].dtype in ['int64', 'float64']
+                compare_is_numeric = self.data[compare_feat].dtype in ['int64', 'float64']
+
+                # Numeric + numeric
+                if base_is_numeric and compare_is_numeric:
+                    # Correlation
+                    correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
+                                                       .corr()[compare_feat][base_feat])
+
+                    # Covariance
+                    covariances[compare_feat] = float(self.data[[compare_feat, base_feat]]
+                                                      .cov()[compare_feat][base_feat])
+
+                    # Scatter plot
+                    scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
+                    full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_scatter.png"))
+                    fig = scatterplot.get_figure()
+                    fig.savefig(full_url)
+                    sns.plt.clf()   # Clear the figure to prepare for the next plot
+                    scatterplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                                                 str(base_feat + "_" + compare_feat + "_scatter.png")
+
+                elif base_is_numeric and not compare_is_numeric:
+                    # Numeric + non-numeric
+                    # Box plots
+                    # z-test
+                    # t-test
+                    # ANOVA
+                    break
+                elif not base_is_numeric and compare_is_numeric:
+                    # Numeric + non-numeric
+                    # Box plots
+                    # z-test
+                    # t-test
+                    # ANOVA
+                    break
+                else:
+                    # Non-numeric and non-numeric
+                    # Stacked bar charts
+                    # Chi squared
+                    # Crater's Chi
+                    # Mantel
+                    break
+
+            # Create interaction object comparing this feature to all others
+            interaction = Interaction(feat_name=base_feat,
+                                      other_features=other_features,
+                                      scatterplots=scatterplots,
+                                      correlations=correlations,
+                                      covariances=covariances,
+                                      boxplots=boxplots,
+                                      ztests=ztests,
+                                      ttests=ttests,
+                                      anova=anova,
+                                      stackedbarplots=stackedbarplots,
+                                      chisquared=chisquared,
+                                      craters=craters,
+                                      mantelhchi=mantelhchi)
+
+            # Add to the collection of interactions
+            interactions_collection[base_feat] = interaction
+
+        # Create interactions object to represent the entire collection
         interactions = Interactions(name=self.title,
-                                    correlations_url=correlation_url_relative,
-                                    covariance_url=covariance_url_relative)
+                                    features=features,
+                                    feature_interactions=interactions_collection)
         interactions_json = jsonpickle.encode(interactions)
+
+        # # Get correlations between features
+        # correlations = self.data.select_dtypes(include=['int64', 'float64']).corr()
+        # correlation_heatmap = sns.heatmap(correlations, vmax=1, square=True)
+        #
+        # # Save the heatmap
+        # correlation_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_corr.png"))
+        # correlation_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_corr.png")
+        # fig = correlation_heatmap.get_figure()
+        # fig.savefig(correlation_url)
+        #
+        # # Clear the figure to prepare for the next plot
+        # sns.plt.clf()
+        #
+        # # Get covariance between features
+        # covariance = self.data.cov()
+        # covariance_heatmap = sns.heatmap(covariance, vmax=1, square=True)
+        # covariance_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_cov.png"))
+        # covariance_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_cov.png")
+        # fig = covariance_heatmap.get_figure()
+        # fig.savefig(covariance_url)
+        # sns.plt.clf()
+        #
+        # # Save data as JSON
+        # interactions = Interactions(name=self.title,
+        #                             correlations_url=correlation_url_relative,
+        #                             covariance_url=covariance_url_relative)
 
         # Save the serialized JSON to a file
         file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + INTERACTIONS_SUFFIX)), 'w')
