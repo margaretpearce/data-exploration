@@ -3,7 +3,7 @@
 
 <h3>Bi-variate Analysis</h3>
 
-<!-- Pick a variable. Select the label by default -->
+<!-- Pick a variable, select the label field by default -->
 <div class="container dataset-menu">
         <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
             <select id="interaction_selector" class="custom-dropdown__select custom-dropdown__select--white">
@@ -14,7 +14,7 @@
         </span>
 </div>
 
-<!-- Table with stats -->
+<!-- Table with bivariate stats for selected variable against all others -->
 {% for f in data.feature_interactions.keys() %}
 <div id="interactions-{{ f.feat_index }}" class="interactions-tables">
     <h4>{{ data.feature_interactions[f].feat_name }}</h4>
@@ -49,5 +49,4 @@
     <br/>
 </div>
 {% endfor %}
-
 {% endblock %}
