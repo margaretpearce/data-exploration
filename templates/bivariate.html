@@ -48,5 +48,12 @@
     {% endif %}
     <br/>
 </div>
+<div>
+    {% for i in data.feature_interactions[f].other_features %}
+        {% if data.feature_interactions[f].scatterplots[i] %}
+        <img src="{{ data.feature_interactions[f].scatterplots[i] }}" >
+        {% endif %}
+    {% endfor %}
+</div>
 {% endfor %}
 {% endblock %}
