@@ -109,8 +109,8 @@
         $(feat_id).removeClass('table-hidden');
         $(graph_id).removeClass('table-hidden');
 
-        // Respond to changing the selected feature
-        $('select').on('change', function() {
+        // Respond to changing the selected feature (univariate)
+        $('#feature_selector').on('change', function() {
             // Hide all tables
             $('.feature-tables').addClass('table-hidden');
             $('.feature-graphs').addClass('table-hidden');
@@ -118,6 +118,26 @@
             // Show the tables for the selected field
             feat_id = "#feature-" + $(this).val();
             graph_id = "#graph-" + $(this).val();
+            $(feat_id).removeClass('table-hidden');
+            $(graph_id).removeClass('table-hidden');
+        });
+
+        // Show the default selected interaction
+        selected_int_id = $('#interaction_selector').find(":selected").val()
+        interaction_id = "#interactions-" + selected_int_id;
+        interactiongraph_id = "#interactiongraphs-" + selected_int_id;
+        $(interaction_id).removeClass('table-hidden');
+        $(interactiongraph_id).removeClass('table-hidden');
+
+        // Respond to changing the selected feature (bivariate)
+        $('#interaction_selector').on('change', function() {
+            // Hide all tables
+            $('.interactions-tables').addClass('table-hidden');
+            $('.interactions-graphs').addClass('table-hidden');
+
+            // Show the tables for the selected field
+            feat_id = "#interactions-" + $(this).val();
+            graph_id = "#interactiongraphs-" + $(this).val();
             $(feat_id).removeClass('table-hidden');
             $(graph_id).removeClass('table-hidden');
         });

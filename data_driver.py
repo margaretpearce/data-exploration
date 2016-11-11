@@ -3,6 +3,7 @@ import os
 import jsonpickle
 import paths
 import seaborn as sns
+from scipy.stats import *
 from Summary import DataSummary
 from Interactions import Interactions
 from Interaction import Interaction
@@ -279,6 +280,9 @@ class DataDriver:
                     # Box plots
                     # z-test
                     # t-test
+                    # ttest = ttest_ind(self.data[compare_feat].tolist(), self.data[base_feat].tolist())
+                    # ttests[compare_feat] = str(ttest)
+
                     # ANOVA
                     break
                 elif not base_is_numeric and compare_is_numeric:
@@ -298,6 +302,7 @@ class DataDriver:
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
+                                      feat_index=feature_index,
                                       other_features=other_features,
                                       scatterplots=scatterplots,
                                       correlations=correlations,
@@ -313,6 +318,7 @@ class DataDriver:
 
             # Add to the collection of interactions
             interactions_collection[base_feat] = interaction
+            feature_index += 1
 
         # Create interactions object to represent the entire collection
         interactions = Interactions(name=self.title,

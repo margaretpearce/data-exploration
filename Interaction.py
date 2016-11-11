@@ -1,8 +1,10 @@
 class Interaction(object):
-    def __init__(self, feat_name, other_features = [], scatterplots={}, correlations={}, covariances={}, boxplots={},
-                 ztests={}, ttests={}, anova={}, stackedbarplots={}, chisquared={}, craters={}, mantelhchi={}):
+    def __init__(self, feat_name, feat_index, other_features = [], scatterplots={}, correlations={}, covariances={},
+                 boxplots={}, ztests={}, ttests={}, anova={}, stackedbarplots={}, chisquared={}, craters={},
+                 mantelhchi={}):
         # Feature comparing against all others in the data set
         self.feat_name = feat_name
+        self.feat_index = feat_index
         self.other_features = other_features
 
         # Continuous & continuous

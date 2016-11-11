@@ -16,7 +16,7 @@
 
 <!-- Table with bivariate stats for selected variable against all others -->
 {% for f in data.feature_interactions.keys() %}
-<div id="interactions-{{ f.feat_index }}" class="interactions-tables">
+<div id="interactions-{{ data.feature_interactions[f].feat_index }}" class="interactions-tables table-hidden">
     <h4>{{ data.feature_interactions[f].feat_name }}</h4>
     {% if data.feature_interactions[f].correlations %}
     <div class="table-responsive">
@@ -48,10 +48,13 @@
     {% endif %}
     <br/>
 </div>
-<div>
+<div id="interactiongraphs-{{ data.feature_interactions[f].feat_index }}" class="interactions-graphs table-hidden">
     {% for i in data.feature_interactions[f].other_features %}
         {% if data.feature_interactions[f].scatterplots[i] %}
         <img src="{{ data.feature_interactions[f].scatterplots[i] }}" >
+        {% endif %}
+        {% if data.feature_interactions[f].ttests[i] %}
+        <div>data.feature_interactions[f].ttests[i]</div>
         {% endif %}
     {% endfor %}
 </div>
