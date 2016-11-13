@@ -85,7 +85,8 @@ class DataDriver:
         # For each feature, get as much relevant info as possible
         for var_name in self.data.columns.values:
             # Common for all field types
-            var_type = None
+            var_datatype = None
+            var_vartype = None
             raw_type = str(self.data[var_name].dtype)
 
             if raw_type == "int64":
@@ -93,23 +94,39 @@ class DataDriver:
                 unique_vals = self.data[var_name].unique()
                 for val in unique_vals:
                     if not (int(val) == 0 or int(val) == 1):
-                        var_type = "Integer"
-                if not var_type == "Integer":
-                    var_type = "Boolean"
+                        var_datatype = "Integer"
+                if not var_datatype == "Integer":
+                    var_datatype = "Boolean"
             elif raw_type == "float64":
-                var_type = "Float"
+                var_datatype = "Float"
             elif raw_type == "datetime64":
-                var_type = "Date"
+                var_datatype = "Date"
             elif raw_type == "object":
-                var_type = "String"
+                var_datatype = "String"
 
             var_count = int(self.data[var_name].count())
 
             missing_count = int(self.data[var_name].isnull().sum())
             missing_percent = missing_count / float(var_count)
             var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
-
             var_unique = int(len(self.data[var_name].unique()))
+
+            # Variable type: categorical, continuous, binary
+            if var_datatype == "Boolean":
+                var_vartype = "Binary"
+            elif var_datatype == "String" or var_datatype == "Date":
+                var_vartype = "Categorical"
+            elif var_datatype == "Integer" or var_datatype == "Float":
+                if 1.*var_unique/var_count < 0.10:
+                    var_vartype = "Categorical"
+                else:
+                    var_vartype = "Continuous"
+
+            # Denote label and index
+            if var_name == self.id_column:
+                var_vartype = var_vartype + " (ID)"
+            elif var_name == self.label_column:
+                var_vartype = var_vartype + " (Label)"
 
             # Numeric only
             var_avg = None
@@ -189,7 +206,8 @@ class DataDriver:
 
             feature = Feature(feat_name=var_name,
                               feat_index=feature_index,
-                              feat_type=var_type,
+                              feat_datatype=var_datatype,
+                              feat_vartype=var_vartype,
                               feat_count=var_count,
                               feat_missing=var_missing,
                               feat_unique=var_unique,
