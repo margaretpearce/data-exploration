@@ -292,6 +292,16 @@ class DataDriver:
                         sns.plt.clf()   # Clear the figure to prepare for the next plot
                         boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
+                elif not base_is_categorical and compare_is_categorical:
+                    if base_is_numeric:
+                        # Swarm plot
+                        boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                        fig = boxplot.get_figure()
+                        fig.savefig(full_url)
+                        sns.plt.clf()   # Clear the figure to prepare for the next plot
+                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
                 # elif base_is_numeric and not compare_is_numeric:
                 #     # Numeric + non-numeric
