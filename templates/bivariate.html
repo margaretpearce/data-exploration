@@ -50,9 +50,15 @@
 </div>
 <div id="interactiongraphs-{{ data.feature_interactions[f].feat_index }}" class="interactions-graphs table-hidden">
     {% for i in data.feature_interactions[f].other_features %}
+        <!-- Scatter plots -->
         {% if data.feature_interactions[f].scatterplots[i] %}
         <img src="{{ data.feature_interactions[f].scatterplots[i] }}" >
         {% endif %}
+        <!-- Box plot -->
+        {% if data.feature_interactions[f].boxplots[i] %}
+        <img src="{{ data.feature_interactions[f].boxplots[i] }}" >
+        {% endif %}
+        <!-- Ttest (temp -->
         {% if data.feature_interactions[f].ttests[i] %}
         <div>data.feature_interactions[f].ttests[i]</div>
         {% endif %}

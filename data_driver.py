@@ -256,7 +256,13 @@ class DataDriver:
                 base_is_numeric = self.data[base_feat].dtype in ['int64', 'float64']
                 compare_is_numeric = self.data[compare_feat].dtype in ['int64', 'float64']
 
-                # Numeric + numeric
+                base_is_categorical = 1.*self.data[base_feat].nunique()/self.data[base_feat].count() < 0.05
+                compare_is_categorical = 1.*self.data[compare_feat].nunique()/self.data[compare_feat].count() < 0.05
+
+                base_all_unique = 1.*self.data[base_feat].nunique()/self.data[base_feat].count() > 0.95
+                compare_all_unique = 1.*self.data[compare_feat].nunique()/self.data[compare_feat].count() > 0.95
+
+                # Numeric + numeric: Get numeric stats
                 if base_is_numeric and compare_is_numeric:
                     # Correlation
                     correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
@@ -265,40 +271,70 @@ class DataDriver:
                     # Covariance
                     covariances[compare_feat] = float(self.data[[compare_feat, base_feat]]
                                                       .cov()[compare_feat][base_feat])
-
+                # Continous + continuous
+                if base_is_numeric and compare_is_numeric:
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                    full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_scatter.png"))
+                    full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png"))
                     fig = scatterplot.get_figure()
                     fig.savefig(full_url)
                     sns.plt.clf()   # Clear the figure to prepare for the next plot
                     scatterplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str(base_feat + "_" + compare_feat + "_scatter.png")
+                                                 str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
+                elif base_is_categorical and not compare_is_categorical:
+                    # Only do the plot if there aren't too many unique values for base
+                    if compare_is_numeric:
+                        # Swarm plot
+                        boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                        fig = boxplot.get_figure()
+                        fig.savefig(full_url)
+                        sns.plt.clf()   # Clear the figure to prepare for the next plot
+                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
-                elif base_is_numeric and not compare_is_numeric:
-                    # Numeric + non-numeric
-                    # Box plots
-                    # z-test
-                    # t-test
-                    # ttest = ttest_ind(self.data[compare_feat].tolist(), self.data[base_feat].tolist())
-                    # ttests[compare_feat] = str(ttest)
-
-                    # ANOVA
-                    break
-                elif not base_is_numeric and compare_is_numeric:
-                    # Numeric + non-numeric
-                    # Box plots
-                    # z-test
-                    # t-test
-                    # ANOVA
-                    break
-                else:
-                    # Non-numeric and non-numeric
-                    # Stacked bar charts
-                    # Chi squared
-                    # Crater's Chi
-                    # Mantel
-                    break
+                # elif base_is_numeric and not compare_is_numeric:
+                #     # Numeric + non-numeric
+                #     # Box plots
+                #     boxplot = sns.swarmplot(x=compare_feat, y=base_feat, data=self.data[[compare_feat, base_feat]]);
+                #     # boxplot = sns.boxplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
+                #     full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_box.png"))
+                #     fig = boxplot.get_figure()
+                #     fig.savefig(full_url)
+                #     sns.plt.clf()   # Clear the figure to prepare for the next plot
+                #     boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                #                                  str(base_feat + "_" + compare_feat + "_box.png")
+                #
+                #     # z-test
+                #     # t-test
+                #     # ttest = ttest_ind(self.data[compare_feat].tolist(), self.data[base_feat].tolist())
+                #     # ttests[compare_feat] = str(ttest)
+                #
+                #     # ANOVA
+                #     break
+                # elif not base_is_numeric and compare_is_numeric:
+                #     # Numeric + non-numeric
+                #     # Box plots
+                #     boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
+                #     # boxplot = sns.boxplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
+                #     full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_box.png"))
+                #     fig = boxplot.get_figure()
+                #     fig.savefig(full_url)
+                #     sns.plt.clf()   # Clear the figure to prepare for the next plot
+                #     boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                #                                  str(base_feat + "_" + compare_feat + "_box.png")
+                #     # z-test
+                #     # t-test
+                #     # ANOVA
+                #     break
+                # else:
+                #     # Non-numeric and non-numeric
+                #     # Stacked bar charts
+                #
+                #     # Chi squared
+                #     # Crater's Chi
+                #     # Mantel
+                #     break
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
