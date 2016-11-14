@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import jsonpickle
 import paths
+import const_types
 import seaborn as sns
 from scipy.stats import *
 from Summary import DataSummary
@@ -239,6 +240,47 @@ class DataDriver:
         file.write(features_json)
         file.close()
 
+    def get_data_type(self, feat_name):
+        raw_type = str(self.data[feat_name].dtype)
+        var_datatype = None
+
+        if raw_type == "int64":
+            # Check if it's really a boolean
+            unique_vals = self.data[feat_name].unique()
+            for val in unique_vals:
+                if not (int(val) == 0 or int(val) == 1):
+                    var_datatype = const_types.DATATYPE_INTEGER
+            if not var_datatype == const_types.DATATYPE_INTEGER:
+                var_datatype = const_types.DATATYPE_BOOLEAN
+        elif raw_type == "float64":
+            var_datatype = const_types.DATATYPE_FLOAT
+        elif raw_type == "datetime64":
+            var_datatype =  const_types.DATATYPE_DATE
+        elif raw_type == "object":
+            var_datatype = const_types.DATATYPE_STRING
+
+        return var_datatype
+
+    def get_variable_type(self, feat_name):
+        var_datatype = self.get_data_type(feat_name)
+        var_vartype = None
+
+        # Variable type: categorical, continuous, binary
+        if var_datatype == const_types.DATATYPE_BOOLEAN:
+            var_vartype = const_types.VARTYPE_BINARY
+        elif var_datatype == const_types.DATATYPE_STRING or var_datatype == const_types.DATATYPE_DATE:
+            var_vartype = const_types.VARTYPE_CATEGORICAL
+        elif var_datatype == const_types.DATATYPE_INTEGER or var_datatype == const_types.DATATYPE_FLOAT:
+            if float(len(self.data[feat_name].unique()))/self.data[feat_name].count() < 0.10:
+                var_vartype = const_types.VARTYPE_CATEGORICAL
+            else:
+                var_vartype = const_types.VARTYPE_CONTINUOUS
+
+        return var_vartype
+
+    def get_percent_unique(self, feat_name):
+        return float(len(self.data[feat_name].unique()))/self.data[feat_name].count()
+
     def generate_interactions_json(self):
         interactions_collection = {}
         features = []
@@ -246,10 +288,17 @@ class DataDriver:
         feature_index = 0
         feature_names = list(self.data.columns.values)
 
+        # Don't run any comparisons against the ID column
+        if self.id_column in feature_names:
+            feature_names.remove(self.id_column)
+
         # For each feature, get as much relevant info as possible
         for base_feat in feature_names:
             # Save the current feature to the collection
-            base_feature = Feature(feat_name=base_feat, feat_index=feature_index)
+            feat_datatype = self.get_data_type(base_feat)
+            feat_vartype = self.get_variable_type(base_feat)
+            base_feature = Feature(feat_name=base_feat, feat_index=feature_index, feat_datatype=feat_datatype,
+                                   feat_vartype=feat_vartype)
             features.append(base_feature)
 
             # Get a list of all other features
@@ -271,17 +320,17 @@ class DataDriver:
 
             # Compare against all other features
             for compare_feat in other_features:
+                # Get data types of both features
+                compare_datatype = self.get_data_type(compare_feat)
+                compare_vartype = self.get_variable_type(compare_feat)
+
                 base_is_numeric = self.data[base_feat].dtype in ['int64', 'float64']
                 compare_is_numeric = self.data[compare_feat].dtype in ['int64', 'float64']
 
-                base_is_categorical = 1.*self.data[base_feat].nunique()/self.data[base_feat].count() < 0.05
-                compare_is_categorical = 1.*self.data[compare_feat].nunique()/self.data[compare_feat].count() < 0.05
-
-                base_all_unique = 1.*self.data[base_feat].nunique()/self.data[base_feat].count() > 0.95
-                compare_all_unique = 1.*self.data[compare_feat].nunique()/self.data[compare_feat].count() > 0.95
-
                 # Numeric + numeric: Get numeric stats
                 if base_is_numeric and compare_is_numeric:
+                    print("Getting correlation between " + base_feat + " " + compare_feat)
+
                     # Correlation
                     correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
                                                        .corr()[compare_feat][base_feat])
@@ -289,8 +338,10 @@ class DataDriver:
                     # Covariance
                     covariances[compare_feat] = float(self.data[[compare_feat, base_feat]]
                                                       .cov()[compare_feat][base_feat])
-                # Continous + continuous
-                if base_is_numeric and compare_is_numeric:
+                # Base: continous, compare: continuous
+                if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
+                    print("scatterplot " + base_feat + " " + compare_feat)
+
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
                     full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png"))
@@ -299,21 +350,17 @@ class DataDriver:
                     sns.plt.clf()   # Clear the figure to prepare for the next plot
                     scatterplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
-                elif base_is_categorical and not compare_is_categorical:
+
+                # Base: categorical/ binary, compare: continuous
+                elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) \
+                        and compare_vartype == const_types.VARTYPE_CONTINUOUS:
                     # Only do the plot if there aren't too many unique values for base
-                    if compare_is_numeric:
-                        # Swarm plot
-                        boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
-                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
-                        fig = boxplot.get_figure()
-                        fig.savefig(full_url)
-                        sns.plt.clf()   # Clear the figure to prepare for the next plot
-                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
-                elif not base_is_categorical and compare_is_categorical:
-                    if base_is_numeric:
-                        # Swarm plot
-                        boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
+                    print("boxplot " + base_feat + " " + compare_feat)
+
+                    # Don't plot if too many unique values
+                    if self.get_percent_unique(base_feat) < 0.2:
+                        # box plot
+                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y", data=self.data[[compare_feat, base_feat]]);
                         full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
                         fig = boxplot.get_figure()
                         fig.savefig(full_url)
@@ -321,48 +368,36 @@ class DataDriver:
                         boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
-                # elif base_is_numeric and not compare_is_numeric:
-                #     # Numeric + non-numeric
-                #     # Box plots
-                #     boxplot = sns.swarmplot(x=compare_feat, y=base_feat, data=self.data[[compare_feat, base_feat]]);
-                #     # boxplot = sns.boxplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                #     full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_box.png"))
-                #     fig = boxplot.get_figure()
-                #     fig.savefig(full_url)
-                #     sns.plt.clf()   # Clear the figure to prepare for the next plot
-                #     boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                #                                  str(base_feat + "_" + compare_feat + "_box.png")
-                #
-                #     # z-test
-                #     # t-test
-                #     # ttest = ttest_ind(self.data[compare_feat].tolist(), self.data[base_feat].tolist())
-                #     # ttests[compare_feat] = str(ttest)
-                #
-                #     # ANOVA
-                #     break
-                # elif not base_is_numeric and compare_is_numeric:
-                #     # Numeric + non-numeric
-                #     # Box plots
-                #     boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
-                #     # boxplot = sns.boxplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                #     full_url = os.path.join(paths.EXAMPLES_FOLDER, str(base_feat + "_" + compare_feat + "_box.png"))
-                #     fig = boxplot.get_figure()
-                #     fig.savefig(full_url)
-                #     sns.plt.clf()   # Clear the figure to prepare for the next plot
-                #     boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                #                                  str(base_feat + "_" + compare_feat + "_box.png")
-                #     # z-test
-                #     # t-test
-                #     # ANOVA
-                #     break
-                # else:
-                #     # Non-numeric and non-numeric
-                #     # Stacked bar charts
-                #
-                #     # Chi squared
-                #     # Crater's Chi
-                #     # Mantel
-                #     break
+                # Base: continuous, compare: categorical/ binary
+                elif (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY) \
+                        and feat_vartype == const_types.VARTYPE_CONTINUOUS:
+                    print("box plot c2" + base_feat + " " + compare_feat)
+
+                    # Don't plot if too many unique values
+                    if self.get_percent_unique(compare_feat) < 0.2:
+                        # Swarm plot
+                        # boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
+                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h", data=self.data[[compare_feat, base_feat]]);
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                        fig = boxplot.get_figure()
+                        fig.savefig(full_url)
+                        sns.plt.clf()   # Clear the figure to prepare for the next plot
+                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
+
+                elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) and \
+                    (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY):
+                    print("bar chart " + base_feat + " " + compare_feat)
+
+                    if self.get_percent_unique(compare_feat) < 0.2 and self.get_percent_unique(base_feat) < 0.2:
+                        # Bar chart (x = base, y = # occ, color = compare)
+                        barchart = sns.countplot(x=base_feat, hue=compare_feat, data=self.data[[base_feat, compare_feat]].dropna())
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_bar.png"))
+                        fig = barchart.get_figure()
+                        fig.savefig(full_url)
+                        sns.plt.clf()   # Clear the figure to prepare for the next plot
+                        stackedbarplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
+                                                 str("graphs/" + base_feat + "_" + compare_feat + "_bar.png")
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
@@ -390,32 +425,6 @@ class DataDriver:
                                     feature_interactions=interactions_collection)
         interactions_json = jsonpickle.encode(interactions)
 
-        # # Get correlations between features
-        # correlations = self.data.select_dtypes(include=['int64', 'float64']).corr()
-        # correlation_heatmap = sns.heatmap(correlations, vmax=1, square=True)
-        #
-        # # Save the heatmap
-        # correlation_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_corr.png"))
-        # correlation_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_corr.png")
-        # fig = correlation_heatmap.get_figure()
-        # fig.savefig(correlation_url)
-        #
-        # # Clear the figure to prepare for the next plot
-        # sns.plt.clf()
-        #
-        # # Get covariance between features
-        # covariance = self.data.cov()
-        # covariance_heatmap = sns.heatmap(covariance, vmax=1, square=True)
-        # covariance_url = os.path.join(paths.EXAMPLES_FOLDER, str(self.title + "_cov.png"))
-        # covariance_url_relative = paths.EXAMPLES_RELATIVE + str(self.title + "_cov.png")
-        # fig = covariance_heatmap.get_figure()
-        # fig.savefig(covariance_url)
-        # sns.plt.clf()
-        #
-        # # Save data as JSON
-        # interactions = Interactions(name=self.title,
-        #                             correlations_url=correlation_url_relative,
-        #                             covariance_url=covariance_url_relative)
 
         # Save the serialized JSON to a file
         file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + INTERACTIONS_SUFFIX)), 'w')

@@ -58,6 +58,10 @@
         {% if data.feature_interactions[f].boxplots[i] %}
         <img src="{{ data.feature_interactions[f].boxplots[i] }}" >
         {% endif %}
+        <!-- Bar plot -->
+        {% if data.feature_interactions[f].stackedbarplots[i] %}
+        <img src="{{ data.feature_interactions[f].stackedbarplots[i] }}" >
+        {% endif %}
         <!-- Ttest (temp -->
         {% if data.feature_interactions[f].ttests[i] %}
         <div>data.feature_interactions[f].ttests[i]</div>
