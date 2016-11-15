@@ -58,6 +58,8 @@ class DataDriver:
 
         # Sample data (five rows)
         features_list = list(self.data.columns.values)
+        if "num_missing" in features_list:
+            features_list.remove("num_missing")
         sample_list = self.data.head()[features_list].values.tolist()
 
         summary = DataSummary(name=self.title,
