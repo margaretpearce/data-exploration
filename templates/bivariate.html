@@ -66,6 +66,10 @@
         {% if data.feature_interactions[f].ttests[i] %}
         <div>data.feature_interactions[f].ttests[i]</div>
         {% endif %}
+        <!-- Chi-Squared -->
+        {% if data.feature_interactions[f].chisquared[i] %}
+        <div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>
+        {% endif %}
     {% endfor %}
 </div>
 {% endfor %}

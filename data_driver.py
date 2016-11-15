@@ -4,7 +4,7 @@ import jsonpickle
 import paths
 import const_types
 import seaborn as sns
-from scipy.stats import *
+from scipy.stats import chi2_contingency
 from Summary import DataSummary
 from Interactions import Interactions
 from Interaction import Interaction
@@ -283,6 +283,12 @@ class DataDriver:
     def get_percent_unique(self, feat_name):
         return float(len(self.data[feat_name].unique()))/self.data[feat_name].count()
 
+    def get_chisquared(self, feat1, feat2):
+        group_by_pair = self.data.groupby([feat1, feat2]).size()
+        count_by_pair = group_by_pair.unstack(feat1)
+        # return (chi2_contingency(count_by_pair.fillna(0)))
+        return (chi2_contingency(count_by_pair.dropna()))
+
     def generate_interactions_json(self):
         interactions_collection = {}
         features = []
@@ -387,6 +393,7 @@ class DataDriver:
                         boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
+                # Categorical and categorical
                 elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) and \
                     (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY):
                     print("bar chart " + base_feat + " " + compare_feat)
@@ -400,6 +407,11 @@ class DataDriver:
                         sns.plt.clf()   # Clear the figure to prepare for the next plot
                         stackedbarplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_bar.png")
+
+                        # Chi-Squared
+                        (chi2, p, dof, ex) = self.get_chisquared(base_feat, compare_feat)
+                        chisq = str("%.3f (p-value: %.5f)" % (chi2, p))
+                        chisquared[compare_feat] = str(chisq)
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
