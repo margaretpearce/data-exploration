@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import os
 import jsonpickle
 import paths
@@ -284,10 +285,14 @@ class DataDriver:
         return float(len(self.data[feat_name].unique()))/self.data[feat_name].count()
 
     def get_chisquared(self, feat1, feat2):
-        group_by_pair = self.data.groupby([feat1, feat2]).size()
-        count_by_pair = group_by_pair.unstack(feat1)
-        # return (chi2_contingency(count_by_pair.fillna(0)))
-        return (chi2_contingency(count_by_pair.dropna()))
+        freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
+        return (chi2_contingency(freq_table.dropna()))
+
+    def get_cramersv(self, feat1, feat2):
+        freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
+        chi2 = self.get_chisquared(feat1, feat2)[0]
+        n = freq_table.sum().sum()
+        return np.sqrt(chi2/ (n*(min(freq_table.shape) - 1)))
 
     def generate_interactions_json(self):
         interactions_collection = {}
@@ -323,7 +328,7 @@ class DataDriver:
             anova={}
             stackedbarplots={}
             chisquared={}
-            craters={}
+            cramers={}
             mantelhchi={}
 
             # Compare against all other features
@@ -411,7 +416,12 @@ class DataDriver:
                         # Chi-Squared
                         (chi2, p, dof, ex) = self.get_chisquared(base_feat, compare_feat)
                         chisq = str("%.3f (p-value: %.5f)" % (chi2, p))
-                        chisquared[compare_feat] = str(chisq)
+                        chisquared[compare_feat] = chisq
+
+                        # Cramer's V
+                        cramersvstat = self.get_cramersv(base_feat, compare_feat)
+                        cramersv = str(cramersvstat)
+                        cramers[compare_feat] = cramersv
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
@@ -426,7 +436,7 @@ class DataDriver:
                                       anova=anova,
                                       stackedbarplots=stackedbarplots,
                                       chisquared=chisquared,
-                                      craters=craters,
+                                      cramers=cramers,
                                       mantelhchi=mantelhchi)
 
             # Add to the collection of interactions

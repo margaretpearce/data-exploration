@@ -70,6 +70,10 @@
         {% if data.feature_interactions[f].chisquared[i] %}
         <div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>
         {% endif %}
+        <!-- Cramer's V -->
+        {% if data.feature_interactions[f].cramers[i] %}
+        <div>Cramer's V: {{ data.feature_interactions[f].cramers[i] }}</div>
+        {% endif %}
     {% endfor %}
 </div>
 {% endfor %}
