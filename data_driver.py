@@ -286,13 +286,15 @@ class DataDriver:
 
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
-        return (chi2_contingency(freq_table.dropna()))
+        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) != 0:
+            return chi2_contingency(freq_table.dropna())
 
     def get_cramersv(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
-        chi2 = self.get_chisquared(feat1, feat2)[0]
-        n = freq_table.sum().sum()
-        return np.sqrt(chi2/ (n*(min(freq_table.shape) - 1)))
+        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) != 0:
+            chi2 = self.get_chisquared(feat1, feat2)[0]
+            n = freq_table.sum().sum()
+            return np.sqrt(chi2/ (n*(min(freq_table.shape) - 1)))
 
     def generate_interactions_json(self):
         interactions_collection = {}
@@ -414,14 +416,17 @@ class DataDriver:
                                                  str("graphs/" + base_feat + "_" + compare_feat + "_bar.png")
 
                         # Chi-Squared
-                        (chi2, p, dof, ex) = self.get_chisquared(base_feat, compare_feat)
-                        chisq = str("%.3f (p-value: %.5f)" % (chi2, p))
-                        chisquared[compare_feat] = chisq
+                        chi_results = self.get_chisquared(base_feat, compare_feat)
+                        if chi_results is not None:
+                            (chi2, p, dof, ex) = chi_results
+                            chisq = str("%.3f (p-value: %.5f)" % (chi2, p))
+                            chisquared[compare_feat] = chisq
 
                         # Cramer's V
                         cramersvstat = self.get_cramersv(base_feat, compare_feat)
-                        cramersv = str(cramersvstat)
-                        cramers[compare_feat] = cramersv
+                        if cramersvstat is not None:
+                            cramersv = str(cramersvstat)
+                            cramers[compare_feat] = cramersv
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
