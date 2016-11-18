@@ -25,7 +25,6 @@ class DataDriver:
         self.title = title
         self.id_column = idcolumn
         self.label_column = labelcolumn
-
         self.data = None
 
         # Check if the data file exists, and if so, load the data
