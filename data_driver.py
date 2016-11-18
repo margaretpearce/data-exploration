@@ -318,11 +318,9 @@ class DataDriver:
 
                 # Get the variable type and data type of both features
                 compare_vartype = self.get_variable_type(compare_feat)
-                base_is_numeric = self.data[base_feat].dtype in ['int64', 'float64']
-                compare_is_numeric = self.data[compare_feat].dtype in ['int64', 'float64']
 
-                # Numeric + numeric: Get numeric stats
-                if base_is_numeric and compare_is_numeric:
+                # Case #1 - Base: continous, compare: continuous
+                if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
                     # Correlation
                     correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
@@ -331,8 +329,6 @@ class DataDriver:
                     # Covariance
                     covariances[compare_feat] = float(self.data[[compare_feat, base_feat]]
                                                       .cov()[compare_feat][base_feat])
-                # Base: continous, compare: continuous
-                if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
@@ -344,7 +340,7 @@ class DataDriver:
                     scatterplots[compare_feat] = \
                         paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
 
-                # Base: categorical/ binary, compare: continuous
+                # Case #2 - Base: categorical/ binary, compare: continuous
                 elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) \
                         and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
@@ -361,12 +357,12 @@ class DataDriver:
                         boxplots[compare_feat] = \
                             paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
-                # Base: continuous, compare: categorical/ binary
+                # Case #3 - Base: continuous, compare: categorical/ binary
                 elif (
                         compare_vartype == const_types.VARTYPE_CATEGORICAL or
                         compare_vartype == const_types.VARTYPE_BINARY
                 ) and feat_vartype == const_types.VARTYPE_CONTINUOUS:
-                    
+
                     # Don't plot if too many unique values
                     if self.get_percent_unique(compare_feat) < 0.2:
                         # Box plot
@@ -380,16 +376,16 @@ class DataDriver:
                         boxplots[compare_feat] = \
                             paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
-                # Categorical and categorical
+                # Case #4 - Base: categorical/binary, compare: categorical/binary
                 elif (
                         feat_vartype == const_types.VARTYPE_CATEGORICAL or
                         feat_vartype == const_types.VARTYPE_BINARY
                 ) and (
                         compare_vartype == const_types.VARTYPE_CATEGORICAL or
                         compare_vartype == const_types.VARTYPE_BINARY):
-                    print("bar chart " + base_feat + " " + compare_feat)
 
                     if self.get_percent_unique(compare_feat) < 0.2 and self.get_percent_unique(base_feat) < 0.2:
+
                         # Bar chart (x = base, y = # occ, color = compare)
                         barchart = sns.countplot(x=base_feat, hue=compare_feat,
                                                  data=self.data[[base_feat, compare_feat]].dropna())
