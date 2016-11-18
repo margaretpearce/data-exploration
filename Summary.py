@@ -1,4 +1,4 @@
-class DataSummary(object):
+class Summary(object):
     def __init__(self, name, num_records, num_features, index_column=None, label_column=None, rows_no_missing=None,
                  rows_one_missing=None, rows_two_missing=None, rows_three_more_missing=None, features_list=None,
                  sample_list=None):

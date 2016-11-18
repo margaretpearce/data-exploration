@@ -5,11 +5,11 @@ import numpy as np
 import seaborn as sns
 from scipy.stats import chi2_contingency
 
-from Summary import DataSummary
-from Interactions import Interactions
-from Interaction import Interaction
-from Feature import Feature
-from Features import Features
+from summary import Summary
+from interactions import Interactions
+from interaction import Interaction
+from feature import Feature
+from features import Features
 import paths
 import const_types
 
@@ -62,7 +62,7 @@ class DataDriver:
             features_list.remove("num_missing")
         sample_list = self.data.head()[features_list].values.tolist()
 
-        summary = DataSummary(name=self.title,
+        summary = Summary(name=self.title,
                               num_records=num_records,
                               num_features=num_features,
                               index_column=index_column,
