@@ -1,16 +1,17 @@
-import pandas as pd
-import numpy as np
 import os
 import jsonpickle
-import paths
-import const_types
+import pandas as pd
+import numpy as np
 import seaborn as sns
 from scipy.stats import chi2_contingency
+
 from Summary import DataSummary
 from Interactions import Interactions
 from Interaction import Interaction
 from Feature import Feature
 from Features import Features
+import paths
+import const_types
 
 SUMMARY_SUFFIX = "_summary.json"
 FEATURES_SUFFIX = "_features.json"
@@ -25,7 +26,6 @@ class DataDriver:
         self.id_column = idcolumn
         self.label_column = labelcolumn
 
-        # Other class variables
         self.data = None
 
         # Check if the data file exists, and if so, load the data
@@ -86,51 +86,23 @@ class DataDriver:
         features_collection = []
         feature_index = 0
 
-        # For each feature, get as much relevant info as possible
+        # Univariate analysis for each feature
         for var_name in self.data.columns.values:
+
             # Common for all field types
-            var_datatype = None
-            var_vartype = None
-            raw_type = str(self.data[var_name].dtype)
-
-            if raw_type == "int64":
-                # Check if it's really a boolean
-                unique_vals = self.data[var_name].unique()
-                for val in unique_vals:
-                    if not (int(val) == 0 or int(val) == 1):
-                        var_datatype = "Integer"
-                if not var_datatype == "Integer":
-                    var_datatype = "Boolean"
-            elif raw_type == "float64":
-                var_datatype = "Float"
-            elif raw_type == "datetime64":
-                var_datatype = "Date"
-            elif raw_type == "object":
-                var_datatype = "String"
-
+            var_datatype = self.get_data_type(var_name)
+            var_vartype = self.get_variable_type(var_name)
             var_count = int(self.data[var_name].count())
-
             missing_count = int(self.data[var_name].isnull().sum())
             missing_percent = missing_count / float(var_count)
             var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
             var_unique = int(len(self.data[var_name].unique()))
 
-            # Variable type: categorical, continuous, binary
-            if var_datatype == "Boolean":
-                var_vartype = "Binary"
-            elif var_datatype == "String" or var_datatype == "Date":
-                var_vartype = "Categorical"
-            elif var_datatype == "Integer" or var_datatype == "Float":
-                if 1.*var_unique/var_count < 0.10:
-                    var_vartype = "Categorical"
-                else:
-                    var_vartype = "Continuous"
-
-            # Denote label and index
+            # Denote label and index, if applicable
             if var_name == self.id_column:
-                var_vartype = var_vartype + " (ID)"
+                var_vartype += " (ID)"
             elif var_name == self.label_column:
-                var_vartype = var_vartype + " (Label)"
+                var_vartype += " (Label)"
 
             # Numeric only
             var_avg = None
@@ -171,7 +143,7 @@ class DataDriver:
 
                 mode = self.data[var_name].mode()
                 if mode is not None:
-                    var_mode = ""
+                    var_mode = ""   # Show all values for the mode (in the event of a tie)
                     for m in mode:
                         var_mode = var_mode + str(m) + " "
 
@@ -181,17 +153,19 @@ class DataDriver:
                                      (self.data[var_name].value_counts().idxmax(),
                                       self.data[var_name].value_counts().max()))
                 var_leastcommon = str("%s (%d)" %
-                                     (self.data[var_name].value_counts().idxmin(),
-                                      self.data[var_name].value_counts().min()))
+                                      (self.data[var_name].value_counts().idxmin(),
+                                       self.data[var_name].value_counts().min()))
 
-            # Histogram/ countplot
+            # Histogram (numeric)
             if self.data[var_name].dtype in ['int64', 'float64']:
                 hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
                 full_url = os.path.join(paths.EXAMPLES_FOLDER, str(var_name + "_hist.png"))
                 fig = hist_plot.get_figure()
-                fig.savefig(full_url)   # Save the histogram
-                sns.plt.clf()   # Clear the figure to prepare for the next plot
-                graph_histogram = paths.EXAMPLES_RELATIVE + str(var_name + "_hist.png")    # Relative histogram URL
+                fig.savefig(full_url)  # Save the histogram
+                sns.plt.clf()  # Clear the figure to prepare for the next plot
+                graph_histogram = paths.EXAMPLES_RELATIVE + str(var_name + "_hist.png")  # Relative histogram URL
+
+            # Countplot (non-numeric)
             else:
                 countplot = sns.countplot(y=self.data[var_name].dropna())
 
@@ -203,11 +177,12 @@ class DataDriver:
                 full_url = os.path.join(paths.EXAMPLES_FOLDER, str(var_name + "_countplot.png"))
                 fig = countplot.get_figure()
                 fig.savefig(full_url)
-                sns.plt.clf()   # Clear the figure to prepare for the next plot
+                sns.plt.clf()  # Clear the figure to prepare for the next plot
 
                 # Return the relative URL to the histogram
                 graph_countplot = paths.EXAMPLES_RELATIVE + str(var_name + "_countplot.png")
 
+            # Save the feature stats
             feature = Feature(feat_name=var_name,
                               feat_index=feature_index,
                               feat_datatype=var_datatype,
@@ -247,6 +222,7 @@ class DataDriver:
         raw_type = str(self.data[feat_name].dtype)
         var_datatype = None
 
+        # Get the data type based on its raw type
         if raw_type == "int64":
             # Check if it's really a boolean
             unique_vals = self.data[feat_name].unique()
@@ -258,13 +234,14 @@ class DataDriver:
         elif raw_type == "float64":
             var_datatype = const_types.DATATYPE_FLOAT
         elif raw_type == "datetime64":
-            var_datatype =  const_types.DATATYPE_DATE
+            var_datatype = const_types.DATATYPE_DATE
         elif raw_type == "object":
             var_datatype = const_types.DATATYPE_STRING
 
         return var_datatype
 
     def get_variable_type(self, feat_name):
+        # Get the variable type based on data type and heuristics
         var_datatype = self.get_data_type(feat_name)
         var_vartype = None
 
@@ -274,7 +251,9 @@ class DataDriver:
         elif var_datatype == const_types.DATATYPE_STRING or var_datatype == const_types.DATATYPE_DATE:
             var_vartype = const_types.VARTYPE_CATEGORICAL
         elif var_datatype == const_types.DATATYPE_INTEGER or var_datatype == const_types.DATATYPE_FLOAT:
-            if float(len(self.data[feat_name].unique()))/self.data[feat_name].count() < 0.10:
+            # Distinguish int categorical variables (e.g. 1, 2, 3) from int continuous (e.g. 1, 2, ..., 1000)
+            # Assuming categorical features have 10% or fewer unique values over the data set
+            if self.get_percent_unique(feat_name) < 0.10:
                 var_vartype = const_types.VARTYPE_CATEGORICAL
             else:
                 var_vartype = const_types.VARTYPE_CONTINUOUS
@@ -282,7 +261,7 @@ class DataDriver:
         return var_vartype
 
     def get_percent_unique(self, feat_name):
-        return float(len(self.data[feat_name].unique()))/self.data[feat_name].count()
+        return float(len(self.data[feat_name].unique())) / self.data[feat_name].count()
 
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
@@ -294,7 +273,7 @@ class DataDriver:
         if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) != 0:
             chi2 = self.get_chisquared(feat1, feat2)[0]
             n = freq_table.sum().sum()
-            return np.sqrt(chi2/ (n*(min(freq_table.shape) - 1)))
+            return np.sqrt(chi2 / (n * (min(freq_table.shape) - 1)))
 
     def generate_interactions_json(self):
         interactions_collection = {}
@@ -309,6 +288,7 @@ class DataDriver:
 
         # For each feature, get as much relevant info as possible
         for base_feat in feature_names:
+
             # Save the current feature to the collection
             feat_datatype = self.get_data_type(base_feat)
             feat_vartype = self.get_variable_type(base_feat)
@@ -321,30 +301,28 @@ class DataDriver:
             other_features.remove(base_feat)
 
             # Create empty dictionaries to store comparisons of this field against all others
-            scatterplots={}
-            correlations={}
-            covariances={}
-            boxplots={}
-            ztests={}
-            ttests={}
-            anova={}
-            stackedbarplots={}
-            chisquared={}
-            cramers={}
-            mantelhchi={}
+            scatterplots = {}
+            correlations = {}
+            covariances = {}
+            boxplots = {}
+            ztests = {}
+            ttests = {}
+            anova = {}
+            stackedbarplots = {}
+            chisquared = {}
+            cramers = {}
+            mantelhchi = {}
 
             # Compare against all other features
             for compare_feat in other_features:
-                # Get data types of both features
-                compare_datatype = self.get_data_type(compare_feat)
-                compare_vartype = self.get_variable_type(compare_feat)
 
+                # Get the variable type and data type of both features
+                compare_vartype = self.get_variable_type(compare_feat)
                 base_is_numeric = self.data[base_feat].dtype in ['int64', 'float64']
                 compare_is_numeric = self.data[compare_feat].dtype in ['int64', 'float64']
 
                 # Numeric + numeric: Get numeric stats
                 if base_is_numeric and compare_is_numeric:
-                    print("Getting correlation between " + base_feat + " " + compare_feat)
 
                     # Correlation
                     correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
@@ -355,65 +333,73 @@ class DataDriver:
                                                       .cov()[compare_feat][base_feat])
                 # Base: continous, compare: continuous
                 if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
-                    print("scatterplot " + base_feat + " " + compare_feat)
 
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                    full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png"))
+                    full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat +
+                                                                       "_scatter.png"))
                     fig = scatterplot.get_figure()
                     fig.savefig(full_url)
-                    sns.plt.clf()   # Clear the figure to prepare for the next plot
-                    scatterplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
+                    sns.plt.clf()  # Clear the figure to prepare for the next plot
+                    scatterplots[compare_feat] = \
+                        paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
 
                 # Base: categorical/ binary, compare: continuous
                 elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) \
                         and compare_vartype == const_types.VARTYPE_CONTINUOUS:
-                    # Only do the plot if there aren't too many unique values for base
-                    print("boxplot " + base_feat + " " + compare_feat)
 
                     # Don't plot if too many unique values
                     if self.get_percent_unique(base_feat) < 0.2:
                         # box plot
-                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y", data=self.data[[compare_feat, base_feat]]);
-                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y",
+                                              data=self.data[[compare_feat, base_feat]])
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                                str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
                         fig = boxplot.get_figure()
                         fig.savefig(full_url)
-                        sns.plt.clf()   # Clear the figure to prepare for the next plot
-                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
+                        sns.plt.clf()  # Clear the figure to prepare for the next plot
+                        boxplots[compare_feat] = \
+                            paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
                 # Base: continuous, compare: categorical/ binary
-                elif (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY) \
-                        and feat_vartype == const_types.VARTYPE_CONTINUOUS:
-                    print("box plot c2" + base_feat + " " + compare_feat)
-
+                elif (
+                        compare_vartype == const_types.VARTYPE_CATEGORICAL or
+                        compare_vartype == const_types.VARTYPE_BINARY
+                ) and feat_vartype == const_types.VARTYPE_CONTINUOUS:
+                    
                     # Don't plot if too many unique values
                     if self.get_percent_unique(compare_feat) < 0.2:
-                        # Swarm plot
-                        # boxplot = sns.swarmplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]]);
-                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h", data=self.data[[compare_feat, base_feat]]);
-                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                        # Box plot
+                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",
+                                              data=self.data[[compare_feat, base_feat]])
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                                str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
                         fig = boxplot.get_figure()
                         fig.savefig(full_url)
-                        sns.plt.clf()   # Clear the figure to prepare for the next plot
-                        boxplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
+                        sns.plt.clf()  # Clear the figure to prepare for the next plot
+                        boxplots[compare_feat] = \
+                            paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_box.png")
 
                 # Categorical and categorical
-                elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) and \
-                    (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY):
+                elif (
+                        feat_vartype == const_types.VARTYPE_CATEGORICAL or
+                        feat_vartype == const_types.VARTYPE_BINARY
+                ) and (
+                        compare_vartype == const_types.VARTYPE_CATEGORICAL or
+                        compare_vartype == const_types.VARTYPE_BINARY):
                     print("bar chart " + base_feat + " " + compare_feat)
 
                     if self.get_percent_unique(compare_feat) < 0.2 and self.get_percent_unique(base_feat) < 0.2:
                         # Bar chart (x = base, y = # occ, color = compare)
-                        barchart = sns.countplot(x=base_feat, hue=compare_feat, data=self.data[[base_feat, compare_feat]].dropna())
-                        full_url = os.path.join(paths.EXAMPLES_FOLDER, str("graphs/" + base_feat + "_" + compare_feat + "_bar.png"))
+                        barchart = sns.countplot(x=base_feat, hue=compare_feat,
+                                                 data=self.data[[base_feat, compare_feat]].dropna())
+                        full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                                str("graphs/" + base_feat + "_" + compare_feat + "_bar.png"))
                         fig = barchart.get_figure()
                         fig.savefig(full_url)
-                        sns.plt.clf()   # Clear the figure to prepare for the next plot
-                        stackedbarplots[compare_feat] = paths.EXAMPLES_RELATIVE + \
-                                                 str("graphs/" + base_feat + "_" + compare_feat + "_bar.png")
+                        sns.plt.clf()  # Clear the figure to prepare for the next plot
+                        stackedbarplots[compare_feat] = \
+                            paths.EXAMPLES_RELATIVE + str("graphs/" + base_feat + "_" + compare_feat + "_bar.png")
 
                         # Chi-Squared
                         chi_results = self.get_chisquared(base_feat, compare_feat)
@@ -454,7 +440,6 @@ class DataDriver:
                                     feature_interactions=interactions_collection)
         interactions_json = jsonpickle.encode(interactions)
 
-
         # Save the serialized JSON to a file
         file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title + INTERACTIONS_SUFFIX)), 'w')
         file.write(interactions_json)
@@ -486,6 +471,3 @@ class DataDriver:
             json_str = serialized_file.read()
             deserialized_json = jsonpickle.decode(json_str)
         return deserialized_json
-
-
-
