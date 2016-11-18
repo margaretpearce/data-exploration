@@ -1,5 +1,3 @@
-import os
-
 DATATYPE_INTEGER = "Integer"
 DATATYPE_FLOAT = "Float"
 DATATYPE_BOOLEAN = "Boolean"

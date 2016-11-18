@@ -1,5 +1,5 @@
 class Interaction(object):
-    def __init__(self, feat_name, feat_index, other_features = [], scatterplots={}, correlations={}, covariances={},
+    def __init__(self, feat_name, feat_index, other_features=[None], scatterplots={}, correlations={}, covariances={},
                  boxplots={}, ztests={}, ttests={}, anova={}, stackedbarplots={}, chisquared={}, cramers={},
                  mantelhchi={}):
         # Feature comparing against all others in the data set

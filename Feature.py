@@ -1,9 +1,9 @@
 class Feature(object):
-    def __init__(self, feat_name, feat_index, feat_datatype=None, feat_vartype = None, feat_count=None, feat_missing=None,
-                 feat_unique=None, feat_average=None, feat_median=None, feat_mode=None, feat_max=None, feat_min=None,
-                 feat_stddev=None, feat_variance=None, feat_skew=None, feat_kurtosis=None, feat_quantile25=None,
-                 feat_quantile75=None, feat_iqr=None, feat_mostcommon=None, feat_leastcommon=None, graph_histogram=None,
-                 graph_countplot=None):
+    def __init__(self, feat_name, feat_index, feat_datatype=None, feat_vartype=None, feat_count=None,
+                 feat_missing=None, feat_unique=None, feat_average=None, feat_median=None, feat_mode=None,
+                 feat_max=None, feat_min=None, feat_stddev=None, feat_variance=None, feat_skew=None, feat_kurtosis=None,
+                 feat_quantile25=None, feat_quantile75=None, feat_iqr=None, feat_mostcommon=None, feat_leastcommon=None,
+                 graph_histogram=None, graph_countplot=None):
         # Feature stats
         self.feat_name = feat_name
         self.feat_index = feat_index
