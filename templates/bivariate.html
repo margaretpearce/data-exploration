@@ -23,26 +23,67 @@
         <div class="feature-tables">
             <!-- Label -->
             <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}</h5>
-            <!-- Correlation -->
-            {% if data.feature_interactions[f].correlations[i] %}
-            <div>Correlation: {{ data.feature_interactions[f].correlations[i] }}</div>
+
+            {% if data.feature_interactions[f].correlations[i] or data.feature_interactions[f].covariances[i] or
+                data.feature_interactions[f].ttests[i] or data.feature_interactions[f].chisquared[i] or
+                data.feature_interactions[f].cramers[i]
+            %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    {% if data.feature_interactions[f].correlations[i] %}
+                    <tr>
+                        <td>Correlation</td>
+                        <td>{{ data.feature_interactions[f].correlations[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if data.feature_interactions[f].covariances[i] %}
+                    <tr>
+                        <td>Covariance</td>
+                        <td>{{ data.feature_interactions[f].covariances[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if data.feature_interactions[f].ttests[i] %}
+                    <tr>
+                        <td>T-test</td>
+                        <td>{{ data.feature_interactions[f].ttests[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if data.feature_interactions[f].chisquared[i] %}
+                    <tr>
+                        <td>Chi-Squared</td>
+                        <td>{{ data.feature_interactions[f].chisquared[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if data.feature_interactions[f].cramers[i] %}
+                    <tr>
+                        <td>Cramer's V</td>
+                        <td>{{ data.feature_interactions[f].cramers[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    </table>
+            </div>
             {% endif %}
-            <!-- Covariance -->
-            {% if data.feature_interactions[f].covariances[i] %}
-            <div>Covariance: {{ data.feature_interactions[f].covariances[i] }}</div>
-            {% endif %}
+
+            <!--&lt;!&ndash; Correlation &ndash;&gt;-->
+            <!--{% if data.feature_interactions[f].correlations[i] %}-->
+            <!--<div>Correlation: {{ data.feature_interactions[f].correlations[i] }}</div>-->
+            <!--{% endif %}-->
+            <!--&lt;!&ndash; Covariance &ndash;&gt;-->
+            <!--{% if data.feature_interactions[f].covariances[i] %}-->
+            <!--<div>Covariance: {{ data.feature_interactions[f].covariances[i] }}</div>-->
+            <!--{% endif %}-->
             <!-- Ttest (temp) -->
-            {% if data.feature_interactions[f].ttests[i] %}
-            <div>T-test: data.feature_interactions[f].ttests[i]</div>
-            {% endif %}
+            <!--{% if data.feature_interactions[f].ttests[i] %}-->
+            <!--<div>T-test: {{ data.feature_interactions[f].ttests[i] }}</div>-->
+            <!--{% endif %}-->
             <!-- Chi-Squared -->
-            {% if data.feature_interactions[f].chisquared[i] %}
-            <div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>
-            {% endif %}
-            <!-- Cramer's V -->
-            {% if data.feature_interactions[f].cramers[i] %}
-            <div>Cramer's V: {{ data.feature_interactions[f].cramers[i] }}</div>
-            {% endif %}
+            <!--{% if data.feature_interactions[f].chisquared[i] %}-->
+            <!--<div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>-->
+            <!--{% endif %}-->
+            <!--&lt;!&ndash; Cramer's V &ndash;&gt;-->
+            <!--{% if data.feature_interactions[f].cramers[i] %}-->
+            <!--<div>Cramer's V: {{ data.feature_interactions[f].cramers[i] }}</div>-->
+            <!--{% endif %}-->
         </div>
         <div class="feature-graphs">
             <!-- Graph -->
