@@ -17,17 +17,18 @@
 <!-- Table with bivariate stats for selected variable against all others -->
 {% for f in data.feature_interactions.keys() %}
 <div id="interactions-{{ data.feature_interactions[f].feat_index }}" class="interactions-tables table-hidden">
-    <h4>{{ data.feature_interactions[f].feat_name }}</h4>
+    <!--<h4>{{ data.feature_interactions[f].feat_name }}</h4>-->
     {% for i in data.feature_interactions[f].other_features %}
     <div>
         <div class="feature-tables">
             <!-- Label -->
-            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}: Statistics</h5>
+            <h4>{{ data.feature_interactions[f].feat_name }} and {{ i }}</h4>
 
             {% if data.feature_interactions[f].correlations[i] or data.feature_interactions[f].covariances[i] or
                 data.feature_interactions[f].ttests[i] or data.feature_interactions[f].chisquared[i] or
                 data.feature_interactions[f].cramers[i]
             %}
+            <h6>Statistics</h6>
             <div class="table-responsive">
                 <table class="table table-striped">
                     {% if data.feature_interactions[f].correlations[i] %}
@@ -65,7 +66,7 @@
             {% endif %}
 
             {% if data.feature_interactions[f].frequency_table[i] %}
-            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}: Frequencies</h5>
+            <h6>Frequencies</h6>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>

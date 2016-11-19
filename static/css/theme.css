@@ -109,11 +109,13 @@ body {
 }
 
 .frequency_count_cols {
-	font: italic bold;
+	font-style: italic;
+	font-weight: none;
 }
 
 .frequency_count_rows {
-	font: italic bold;
+	font-style: italic;
+	font-weight: none;
 }
 
 /*  Custom dropdown style from: Red Team Design
