@@ -22,11 +22,11 @@
     <div>
         <div class="feature-tables">
             <!-- Label -->
-            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}</h5>
+            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}: Statistics</h5>
 
             {% if data.feature_interactions[f].correlations[i] or data.feature_interactions[f].covariances[i] or
                 data.feature_interactions[f].ttests[i] or data.feature_interactions[f].chisquared[i] or
-                data.feature_interactions[f].cramers[i] or data.feature_interactions[f].frequency_table[i]
+                data.feature_interactions[f].cramers[i]
             %}
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -60,17 +60,12 @@
                         <td>{{ data.feature_interactions[f].cramers[i] }}</td>
                     </tr>
                     {% endif %}
-                    {% if data.feature_interactions[f].frequency_table[i] %}
-                    <tr>
-                        <td>Frequencies</td>
-                        <td>{{ data.feature_interactions[f].frequency_table[i] }}</td>
-                    </tr>
-                    {% endif %}
                     </table>
             </div>
             {% endif %}
 
             {% if data.feature_interactions[f].frequency_table[i] %}
+            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}: Frequencies</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>

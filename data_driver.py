@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from scipy.stats import chi2_contingency
+from collections import OrderedDict
 
 from summary import Summary
 from interactions import Interactions
@@ -279,7 +280,11 @@ class DataDriver:
             col_counts = {}
             for row in rownames:
                 col_counts[str(row)] = int(freq_table[col][row])
+            col_counts = OrderedDict(sorted(col_counts.items()))
             freq_dictionary[str(col)] = col_counts
+
+        # Force the dictionary to stay sorted
+        freq_dictionary = OrderedDict(sorted(freq_dictionary.items()))
 
         return freq_dictionary, str(colnames[0])
 
