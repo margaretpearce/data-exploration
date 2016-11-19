@@ -264,12 +264,12 @@ class DataDriver:
 
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
-        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) != 0:
+        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
             return chi2_contingency(freq_table.dropna())
 
     def get_cramersv(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
-        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) != 0:
+        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
             chi2 = self.get_chisquared(feat1, feat2)[0]
             n = freq_table.sum().sum()
             return np.sqrt(chi2 / (n * (min(freq_table.shape) - 1)))
