@@ -26,7 +26,7 @@
 
             {% if data.feature_interactions[f].correlations[i] or data.feature_interactions[f].covariances[i] or
                 data.feature_interactions[f].ttests[i] or data.feature_interactions[f].chisquared[i] or
-                data.feature_interactions[f].cramers[i]
+                data.feature_interactions[f].cramers[i] or data.feature_interactions[f].frequency_table[i]
             %}
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -58,6 +58,12 @@
                     <tr>
                         <td>Cramer's V</td>
                         <td>{{ data.feature_interactions[f].cramers[i] }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if data.feature_interactions[f].frequency_table[i] %}
+                    <tr>
+                        <td>Frequencies</td>
+                        <td>{{ data.feature_interactions[f].frequency_table[i] }}</td>
                     </tr>
                     {% endif %}
                     </table>

@@ -9,5 +9,3 @@ class Interactions(object):
         # Feature-to-feature comparisons
         self.feature_interactions = feature_interactions
 
-        self.correlations_url = correlations_url
-        self.covariance_url = covariance_url

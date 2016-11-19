@@ -262,6 +262,23 @@ class DataDriver:
     def get_percent_unique(self, feat_name):
         return float(len(self.data[feat_name].unique())) / self.data[feat_name].count()
 
+    def get_count_unique(self, feat_name):
+        return len(self.data[feat_name].unique())
+
+    def get_freq_dictionary(self, feat1, feat2):
+        freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
+        freq_dictionary = {}
+        colnames = list(freq_table.columns)
+        rownames = list(freq_table.index)
+
+        for row in rownames:
+            row_counts = {}
+            for col in colnames:
+                row_counts[str(col)] = int(freq_table[col][row])
+            freq_dictionary[str(row)] = row_counts
+
+        return freq_dictionary
+
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
         if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
@@ -311,6 +328,7 @@ class DataDriver:
             chisquared = {}
             cramers = {}
             mantelhchi = {}
+            frequencytable = {}
 
             # Compare against all other features
             for compare_feat in other_features:
@@ -409,6 +427,16 @@ class DataDriver:
                             cramersv = str(cramersvstat)
                             cramers[compare_feat] = cramersv
 
+                    # Display frequency table, limit number of results
+                    if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
+                        # Frequency table
+                        frequency_dictionary = self.get_freq_dictionary(base_feat, compare_feat)
+                        frequencytable[compare_feat] = frequency_dictionary
+                    else:
+                        print("base " + base_feat + " " + str(self.get_count_unique(base_feat)))
+                        print("compare " + compare_feat + " " + str(self.get_count_unique(compare_feat)))
+                        print("------------------")
+
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
                                       feat_index=feature_index,
@@ -423,7 +451,8 @@ class DataDriver:
                                       stackedbarplots=stackedbarplots,
                                       chisquared=chisquared,
                                       cramers=cramers,
-                                      mantelhchi=mantelhchi)
+                                      mantelhchi=mantelhchi,
+                                      frequency_table=frequencytable)
 
             # Add to the collection of interactions
             interactions_collection[base_feat] = interaction
