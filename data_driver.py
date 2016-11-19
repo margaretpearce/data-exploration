@@ -268,16 +268,20 @@ class DataDriver:
     def get_freq_dictionary(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
         freq_dictionary = {}
-        colnames = list(freq_table.columns)
-        rownames = list(freq_table.index)
+        colnames_unsorted = list(freq_table.columns)
+        rownames_unsorted = list(freq_table.index)
 
-        for row in rownames:
-            row_counts = {}
-            for col in colnames:
-                row_counts[str(col)] = int(freq_table[col][row])
-            freq_dictionary[str(row)] = row_counts
+        # Sort the row and column names for better printing
+        colnames = sorted(colnames_unsorted)
+        rownames = sorted(rownames_unsorted)
 
-        return freq_dictionary
+        for col in colnames:
+            col_counts = {}
+            for row in rownames:
+                col_counts[str(row)] = int(freq_table[col][row])
+            freq_dictionary[str(col)] = col_counts
+
+        return freq_dictionary, str(colnames[0])
 
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
@@ -329,6 +333,7 @@ class DataDriver:
             cramers = {}
             mantelhchi = {}
             frequencytable = {}
+            frequencytable_firstrow = {}
 
             # Compare against all other features
             for compare_feat in other_features:
@@ -430,12 +435,9 @@ class DataDriver:
                     # Display frequency table, limit number of results
                     if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
                         # Frequency table
-                        frequency_dictionary = self.get_freq_dictionary(base_feat, compare_feat)
+                        frequency_dictionary, first_row_key = self.get_freq_dictionary(base_feat, compare_feat)
                         frequencytable[compare_feat] = frequency_dictionary
-                    else:
-                        print("base " + base_feat + " " + str(self.get_count_unique(base_feat)))
-                        print("compare " + compare_feat + " " + str(self.get_count_unique(compare_feat)))
-                        print("------------------")
+                        frequencytable_firstrow[compare_feat] = first_row_key
 
             # Create interaction object comparing this feature to all others
             interaction = Interaction(feat_name=base_feat,
@@ -452,7 +454,8 @@ class DataDriver:
                                       chisquared=chisquared,
                                       cramers=cramers,
                                       mantelhchi=mantelhchi,
-                                      frequency_table=frequencytable)
+                                      frequency_table=frequencytable,
+                                      frequencytable_firstrow=frequencytable_firstrow)
 
             # Add to the collection of interactions
             interactions_collection[base_feat] = interaction

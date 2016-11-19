@@ -69,6 +69,31 @@
                     </table>
             </div>
             {% endif %}
+
+            {% if data.feature_interactions[f].frequency_table[i] %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for col in data.feature_interactions[f].frequency_table[i][ data.feature_interactions[f].frequencytable_firstrow[i] ].keys() %}
+                        <th class="frequency_count_cols">{{ f }}={{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in data.feature_interactions[f].frequency_table[i].keys() %}
+                    <tr>
+                        <td class="frequency_count_rows">{{ i }}={{ row }}</td>
+                        {% for col in data.feature_interactions[f].frequency_table[i][row].keys() %}
+                        <td>{{ data.feature_interactions[f].frequency_table[i][row][col] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
         </div>
         <div class="feature-graphs">
             <!-- Graph -->

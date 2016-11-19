@@ -108,6 +108,14 @@ body {
 	height: 100%;
 }
 
+.frequency_count_cols {
+	font: italic bold;
+}
+
+.frequency_count_rows {
+	font: italic bold;
+}
+
 /*  Custom dropdown style from: Red Team Design
     Thank you!
     http://red-team-design.com/making-html-dropdowns-not-suck/ */
