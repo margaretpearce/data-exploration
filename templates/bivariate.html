@@ -18,56 +18,51 @@
 {% for f in data.feature_interactions.keys() %}
 <div id="interactions-{{ data.feature_interactions[f].feat_index }}" class="interactions-tables table-hidden">
     <h4>{{ data.feature_interactions[f].feat_name }}</h4>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            {% for i in data.feature_interactions[f].other_features %}
-                <tr>
-                    <td>
-                        <!-- Label -->
-                        <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}</h5>
-                        <!-- Table -->
-                        <!-- Correlation -->
-                        {% if data.feature_interactions[f].correlations[i] %}
-                        <div>Correlation: {{ data.feature_interactions[f].correlations[i] }}</div>
-                        {% endif %}
-                        <!-- Covariance -->
-                        {% if data.feature_interactions[f].covariances[i] %}
-                        <div>Covariance: {{ data.feature_interactions[f].covariances[i] }}</div>
-                        {% endif %}
-                        <!-- Ttest (temp) -->
-                        {% if data.feature_interactions[f].ttests[i] %}
-                        <div>T-test: data.feature_interactions[f].ttests[i]</div>
-                        {% endif %}
-                        <!-- Chi-Squared -->
-                        {% if data.feature_interactions[f].chisquared[i] %}
-                        <div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>
-                        {% endif %}
-                        <!-- Cramer's V -->
-                        {% if data.feature_interactions[f].cramers[i] %}
-                        <div>Cramer's V: {{ data.feature_interactions[f].cramers[i] }}</div>
-                        {% endif %}
-                    </td>
-                    <td width="50%">
-                        <!-- Graph -->
-                        <!-- Scatter plots -->
-                        {% if data.feature_interactions[f].scatterplots[i] %}
-                        <img src="{{ data.feature_interactions[f].scatterplots[i] }}" >
-                        {% endif %}
-                        <!-- Box plot -->
-                        {% if data.feature_interactions[f].boxplots[i] %}
-                        <img src="{{ data.feature_interactions[f].boxplots[i] }}" >
-                        {% endif %}
-                        <!-- Bar plot -->
-                        {% if data.feature_interactions[f].stackedbarplots[i] %}
-                        <img src="{{ data.feature_interactions[f].stackedbarplots[i] }}" >
-                        {% endif %}
-                    </td>
-
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <br/>
-</div>
+    {% for i in data.feature_interactions[f].other_features %}
+    <div>
+        <div class="feature-tables">
+            <!-- Label -->
+            <h5>{{ data.feature_interactions[f].feat_name }} and {{ i }}</h5>
+            <!-- Correlation -->
+            {% if data.feature_interactions[f].correlations[i] %}
+            <div>Correlation: {{ data.feature_interactions[f].correlations[i] }}</div>
+            {% endif %}
+            <!-- Covariance -->
+            {% if data.feature_interactions[f].covariances[i] %}
+            <div>Covariance: {{ data.feature_interactions[f].covariances[i] }}</div>
+            {% endif %}
+            <!-- Ttest (temp) -->
+            {% if data.feature_interactions[f].ttests[i] %}
+            <div>T-test: data.feature_interactions[f].ttests[i]</div>
+            {% endif %}
+            <!-- Chi-Squared -->
+            {% if data.feature_interactions[f].chisquared[i] %}
+            <div>Chi-Squared: {{ data.feature_interactions[f].chisquared[i] }}</div>
+            {% endif %}
+            <!-- Cramer's V -->
+            {% if data.feature_interactions[f].cramers[i] %}
+            <div>Cramer's V: {{ data.feature_interactions[f].cramers[i] }}</div>
+            {% endif %}
+        </div>
+        <div class="feature-graphs">
+            <!-- Graph -->
+            <!-- Scatter plots -->
+            {% if data.feature_interactions[f].scatterplots[i] %}
+            <img src="{{ data.feature_interactions[f].scatterplots[i] }}" >
+            {% endif %}
+            <!-- Box plot -->
+            {% if data.feature_interactions[f].boxplots[i] %}
+            <img src="{{ data.feature_interactions[f].boxplots[i] }}" >
+            {% endif %}
+            <!-- Bar plot -->
+            {% if data.feature_interactions[f].stackedbarplots[i] %}
+            <img src="{{ data.feature_interactions[f].stackedbarplots[i] }}" >
+            {% endif %}
+        </div>
+        <div style="clear: both;"></div>
+    </div> <!-- end container div -->
+    <hr/>
+    {% endfor %}
+</div> <!-- end feature div -->
 {% endfor %}
 {% endblock %}
