@@ -110,12 +110,12 @@ body {
 
 .frequency_count_cols {
 	font-style: italic;
-	font-weight: none;
+	font-weight: normal;
 }
 
 .frequency_count_rows {
 	font-style: italic;
-	font-weight: none;
+	font-weight: normal;
 }
 
 /*  Custom dropdown style from: Red Team Design
