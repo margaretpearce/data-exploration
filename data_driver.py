@@ -28,10 +28,6 @@ class DataDriver:
         self.label_column = labelcolumn
         self.data = None
 
-        # Check if the data file exists, and if so, load the data
-        if os.path.isfile(self.filepath):
-            self.load_data()
-
     def load_data(self):
         # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
@@ -42,6 +38,10 @@ class DataDriver:
             self.data = pd.read_json(self.filepath)
 
     def generate_summary_json(self):
+        # Check if the data file exists, and if so, load the data as needed
+        if self.data == None and os.path.isfile(self.filepath):
+            self.load_data()
+
         # Get summary stats about the data and serialize it as JSON
         num_records = self.data.shape[0]
         num_features = self.data.shape[1]
@@ -83,6 +83,10 @@ class DataDriver:
         file.close()
 
     def generate_features_json(self):
+        # Check if the data file exists, and if so, load the data as needed
+        if self.data == None and os.path.isfile(self.filepath):
+            self.load_data()
+
         features_collection = []
         feature_index = 0
 
@@ -301,6 +305,10 @@ class DataDriver:
             return np.sqrt(chi2 / (n * (min(freq_table.shape) - 1)))
 
     def generate_interactions_json(self):
+        # Check if the data file exists, and if so, load the data as needed
+        if self.data == None and os.path.isfile(self.filepath):
+            self.load_data()
+
         interactions_collection = {}
         features = []
 
