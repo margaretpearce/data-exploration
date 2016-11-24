@@ -69,6 +69,7 @@ def dataset_selection_changed():
     new_label = request.form["data_label_field"]
 
     session["data_file"] = new_selection
+    session["data_title"] = new_title
     session["data_id"] = new_index
     session["data_label"] = new_label
 
