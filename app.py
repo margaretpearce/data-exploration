@@ -2,6 +2,7 @@ from flask import Flask, render_template, session, request
 from data_driver import DataDriver
 import paths
 import key
+import os
 
 app = Flask(__name__)
 
@@ -44,22 +45,6 @@ def selecteddataset():
     return data_file, data_title, data_id, data_label
 
 
-@app.route('/')
-@app.route('/index')
-def index():
-    data_file, data_title, data_id, data_label = selecteddataset()
-    driver = DataDriver(data_file, data_title, data_id, data_label)
-
-    # Get the JSON for the summary data
-    summary_json = driver.load_summary_json()
-
-    return render_template('index.html',
-                           data=summary_json,
-                           data_file=data_file,
-                           data_title = data_title,
-                           data_id = data_id,
-                           data_label = data_label)
-
 @app.route('/dataset_selection_changed', methods=['POST'])
 def dataset_selection_changed():
     # Get the dropdown values and save them in session
@@ -83,6 +68,34 @@ def dataset_selection_changed():
         return index()
 
 
+def datasetuploaded():
+    data_file, data_title, data_id, data_label = selecteddataset()
+
+    # Create folder with graphs subfolder
+    data_path = os.path.join(paths.EXAMPLES_FOLDER, data_title)
+    if not os.path.exists(data_path):
+        os.makedirs(data_path)
+        os.makedirs(os.path.join(data_path, "graphs"))
+
+    # Save the uploaded file to this directory
+
+@app.route('/')
+@app.route('/index')
+def index():
+    data_file, data_title, data_id, data_label = selecteddataset()
+    driver = DataDriver(data_file, data_title, data_id, data_label)
+
+    # Get the JSON for the summary data
+    summary_json = driver.load_summary_json()
+
+    return render_template('index.html',
+                           data=summary_json,
+                           data_file=data_file,
+                           data_title=data_title,
+                           data_id=data_id,
+                           data_label=data_label)
+
+
 @app.route('/univariate')
 def univariate():
     data_file, data_title, data_id, data_label = selecteddataset()
@@ -94,9 +107,9 @@ def univariate():
     return render_template('univariate.html',
                            mydata=features_json,
                            data_file=data_file,
-                           data_title = data_title,
-                           data_id = data_id,
-                           data_label = data_label)
+                           data_title=data_title,
+                           data_id=data_id,
+                           data_label=data_label)
 
 
 @app.route('/bivariate')
@@ -111,6 +124,6 @@ def bivariate():
     return render_template('bivariate.html',
                            data=interactions_json,
                            data_file=data_file,
-                           data_title = data_title,
-                           data_id = data_id,
-                           data_label = data_label)
+                           data_title=data_title,
+                           data_id=data_id,
+                           data_label=data_label)
