@@ -3,6 +3,7 @@ from data_driver import DataDriver
 import paths
 import key
 import os
+import pandas as pd
 
 app = Flask(__name__)
 
@@ -47,17 +48,23 @@ def selecteddataset():
 
 @app.route('/dataset_selection_changed', methods=['POST'])
 def dataset_selection_changed():
-    # Get the dropdown values and save them in session
+    # Get the selected data set's name
     new_selection = str(request.form["data_set_field"])
-    new_title = request.form["data_title_field"]
-    new_index = request.form["data_index_field"]
-    new_label = request.form["data_label_field"]
 
+    # Look up the Title, ID, Label (for existing data sets)
+    datasets = pd.read_csv(paths.DATASETS)
+    dataset = datasets.loc[datasets["FileName"] == new_selection]
+    new_title = dataset["Title"][1]
+    new_index = dataset["ID"][1]
+    new_label = dataset["Label"][1]
+
+    # Save the selection in session
     session["data_file"] = new_selection
     session["data_title"] = new_title
     session["data_id"] = new_index
     session["data_label"] = new_label
 
+    # Redirect and reload the appropriate page
     rule = request.url_rule
 
     if '/univariate' in rule.rule:

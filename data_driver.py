@@ -31,6 +31,7 @@ class DataDriver:
     def load_data(self):
         # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
+            print("PATH: --------------------------" + self.filepath)
             self.data = pd.read_csv(self.filepath)
         elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
             self.data = pd.read_excel(self.filepath)
