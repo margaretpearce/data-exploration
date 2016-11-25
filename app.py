@@ -50,19 +50,22 @@ def selecteddataset():
 def dataset_selection_changed():
     # Get the selected data set's name
     new_selection = str(request.form["data_set_field"])
+    print(new_selection)
 
     # Look up the Title, ID, Label (for existing data sets)
     datasets = pd.read_csv(paths.DATASETS)
     dataset = datasets.loc[datasets["FileName"] == new_selection]
-    new_title = dataset["Title"][1]
-    new_index = dataset["ID"][1]
-    new_label = dataset["Label"][1]
 
-    # Save the selection in session
-    session["data_file"] = new_selection
-    session["data_title"] = new_title
-    session["data_id"] = new_index
-    session["data_label"] = new_label
+    if dataset is not None:
+        new_title = dataset["Title"].values[0]
+        new_index = dataset["ID"].values[0]
+        new_label = dataset["Label"].values[0]
+
+        # Save the selection in session
+        session["data_file"] = new_selection
+        session["data_title"] = new_title
+        session["data_id"] = new_index
+        session["data_label"] = new_label
 
     # Redirect and reload the appropriate page
     rule = request.url_rule
