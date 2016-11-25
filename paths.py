@@ -4,3 +4,11 @@ EXAMPLES_RELATIVE = 'static/data/'
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(APP_ROOT, UPLOAD_RELATIVE)
 EXAMPLES_FOLDER = os.path.join(APP_ROOT, EXAMPLES_RELATIVE)
+GRAPHS_SUBFOLDER = "/graphs/"
+
+# Graph types
+FILE_BARCHART = "_bar.png"
+FILE_BOXCHART = "_box.png"
+FILE_SCATTERPLOT = "_scatter.png"
+FILE_COUNTPLOT = "_countplot.png"
+FILE_HISTOGRAM = "_hist.png"

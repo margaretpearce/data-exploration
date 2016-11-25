@@ -39,7 +39,7 @@ class DataDriver:
 
     def generate_summary_json(self):
         # Check if the data file exists, and if so, load the data as needed
-        if self.data == None and os.path.isfile(self.filepath):
+        if self.data is None and os.path.isfile(self.filepath):
             self.load_data()
 
         # Get summary stats about the data and serialize it as JSON
@@ -64,17 +64,17 @@ class DataDriver:
         sample_list = self.data.head()[features_list].values.tolist()
 
         summary = Summary(name=self.title,
-                              num_records=num_records,
-                              num_features=num_features,
-                              index_column=index_column,
-                              label_column=label_column,
-                              rows_no_missing=num_rows_no_missing,
-                              rows_one_missing=num_rows_one_missing,
-                              rows_two_missing=num_rows_two_missing,
-                              rows_three_more_missing=num_rows_three_more_missing,
-                              features_list=features_list,
-                              sample_list=sample_list
-                              )
+                          num_records=num_records,
+                          num_features=num_features,
+                          index_column=index_column,
+                          label_column=label_column,
+                          rows_no_missing=num_rows_no_missing,
+                          rows_one_missing=num_rows_one_missing,
+                          rows_two_missing=num_rows_two_missing,
+                          rows_three_more_missing=num_rows_three_more_missing,
+                          features_list=features_list,
+                          sample_list=sample_list
+                          )
         summary_json = jsonpickle.encode(summary)
 
         # Save the serialized JSON to a file
@@ -84,7 +84,7 @@ class DataDriver:
 
     def generate_features_json(self):
         # Check if the data file exists, and if so, load the data as needed
-        if self.data == None and os.path.isfile(self.filepath):
+        if self.data is None and os.path.isfile(self.filepath):
             self.load_data()
 
         features_collection = []
@@ -163,11 +163,16 @@ class DataDriver:
             # Histogram (numeric)
             if self.data[var_name].dtype in ['int64', 'float64']:
                 hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
-                full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + var_name + "_hist.png"))
+                full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                        self.title,
+                                        str("graphs/" + var_name + paths.FILE_HISTOGRAM))
                 fig = hist_plot.get_figure()
                 fig.savefig(full_url)  # Save the histogram
                 sns.plt.clf()  # Clear the figure to prepare for the next plot
-                graph_histogram = paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + var_name + "_hist.png")  # Relative histogram URL
+                graph_histogram = \
+                    paths.EXAMPLES_RELATIVE + \
+                    self.title + \
+                    str(paths.GRAPHS_SUBFOLDER + var_name + paths.FILE_HISTOGRAM)
 
             # Countplot (non-numeric)
             else:
@@ -178,13 +183,18 @@ class DataDriver:
                     countplot.set(yticklabels=[])
                     countplot.yaxis.set_visible(False)
 
-                full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + var_name + "_countplot.png"))
+                full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                        self.title,
+                                        str("graphs/" + var_name + paths.FILE_COUNTPLOT))
                 fig = countplot.get_figure()
                 fig.savefig(full_url)
                 sns.plt.clf()  # Clear the figure to prepare for the next plot
 
                 # Return the relative URL to the histogram
-                graph_countplot = paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + var_name + "_countplot.png")
+                graph_countplot = \
+                    paths.EXAMPLES_RELATIVE + \
+                    self.title + \
+                    str(paths.GRAPHS_SUBFOLDER + var_name + paths.FILE_COUNTPLOT)
 
             # Save the feature stats
             feature = Feature(feat_name=var_name,
@@ -306,7 +316,7 @@ class DataDriver:
 
     def generate_interactions_json(self):
         # Check if the data file exists, and if so, load the data as needed
-        if self.data == None and os.path.isfile(self.filepath):
+        if self.data is None and os.path.isfile(self.filepath):
             self.load_data()
 
         interactions_collection = {}
@@ -367,13 +377,16 @@ class DataDriver:
 
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                    full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + base_feat + "_" + compare_feat +
-                                                                       "_scatter.png"))
+                    full_url = os.path.join(paths.EXAMPLES_FOLDER,
+                                            self.title,
+                                            str("graphs/" + base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT))
                     fig = scatterplot.get_figure()
                     fig.savefig(full_url)
                     sns.plt.clf()  # Clear the figure to prepare for the next plot
                     scatterplots[compare_feat] = \
-                        paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + base_feat + "_" + compare_feat + "_scatter.png")
+                        paths.EXAMPLES_RELATIVE + \
+                        self.title + \
+                        str(paths.GRAPHS_SUBFOLDER + base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT)
 
                 # Case #2 - Base: categorical/ binary, compare: continuous
                 elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) \
@@ -386,12 +399,14 @@ class DataDriver:
                                               data=self.data[[compare_feat, base_feat]])
                         full_url = os.path.join(paths.EXAMPLES_FOLDER,
                                                 self.title,
-                                                str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                                                str("graphs/" + base_feat + "_" + compare_feat + paths.FILE_BOXCHART))
                         fig = boxplot.get_figure()
                         fig.savefig(full_url)
                         sns.plt.clf()  # Clear the figure to prepare for the next plot
                         boxplots[compare_feat] = \
-                            paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + base_feat + "_" + compare_feat + "_box.png")
+                            paths.EXAMPLES_RELATIVE + \
+                            self.title + \
+                            str(paths.GRAPHS_SUBFOLDER + base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
                 # Case #3 - Base: continuous, compare: categorical/ binary
                 elif (
@@ -406,12 +421,14 @@ class DataDriver:
                                               data=self.data[[compare_feat, base_feat]])
                         full_url = os.path.join(paths.EXAMPLES_FOLDER,
                                                 self.title,
-                                                str("graphs/" + base_feat + "_" + compare_feat + "_box.png"))
+                                                str("graphs/" + base_feat + "_" + compare_feat + paths.FILE_BOXCHART))
                         fig = boxplot.get_figure()
                         fig.savefig(full_url)
                         sns.plt.clf()  # Clear the figure to prepare for the next plot
                         boxplots[compare_feat] = \
-                            paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + base_feat + "_" + compare_feat + "_box.png")
+                            paths.EXAMPLES_RELATIVE + \
+                            self.title + \
+                            str(paths.GRAPHS_SUBFOLDER + base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
                 # Case #4 - Base: categorical/binary, compare: categorical/binary
                 elif (
@@ -428,12 +445,14 @@ class DataDriver:
                                                  data=self.data[[base_feat, compare_feat]].dropna())
                         full_url = os.path.join(paths.EXAMPLES_FOLDER,
                                                 self.title,
-                                                str("/graphs/" + base_feat + "_" + compare_feat + "_bar.png"))
+                                                str("graphs/" + base_feat + "_" + compare_feat + paths.FILE_BARCHART))
                         fig = barchart.get_figure()
                         fig.savefig(full_url)
                         sns.plt.clf()  # Clear the figure to prepare for the next plot
                         stackedbarplots[compare_feat] = \
-                            paths.EXAMPLES_RELATIVE + self.title + str("/graphs/" + base_feat + "_" + compare_feat + "_bar.png")
+                            paths.EXAMPLES_RELATIVE + \
+                            self.title + \
+                            str(paths.GRAPHS_SUBFOLDER + base_feat + "_" + compare_feat + paths.FILE_BARCHART)
 
                         # Chi-Squared
                         chi_results = self.get_chisquared(base_feat, compare_feat)
