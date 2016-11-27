@@ -138,6 +138,10 @@ body {
 	float: right;
 }
 
+.table {
+	table-layout: fixed;
+}
+
 /*  Custom dropdown style from: Red Team Design
     Thank you!
     http://red-team-design.com/making-html-dropdowns-not-suck/ */
