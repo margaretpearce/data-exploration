@@ -68,6 +68,8 @@ body {
 
 .dataset-menu {
     margin-top: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .tabs {
@@ -124,6 +126,16 @@ body {
 
 .uploadingDataField {
 
+}
+
+.topbar-title {
+	float: left;
+	color: #ffffff;
+	font-size: 14pt;
+}
+
+.topbar-dropdown {
+	float: right;
 }
 
 /*  Custom dropdown style from: Red Team Design

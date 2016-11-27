@@ -8,7 +8,11 @@
         <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
             <select id="interaction_selector" class="custom-dropdown__select custom-dropdown__select--white">
                 {% for f in data.features %}
+                {% if f.feat_name == data_label %}
+                <option value="{{ f.feat_index }}" selected="selected">{{ f.feat_name }}</option>
+                {% else %}
                 <option value="{{ f.feat_index }}">{{ f.feat_name }}</option>
+                {% endif %}
                 {% endfor %}
             </select>
         </span>
