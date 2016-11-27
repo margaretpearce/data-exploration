@@ -89,7 +89,7 @@
                     <tbody>
                     {% for stat in data.feature_interactions[f].statsforcategory %}
                     <tr>
-                        <td class="frequency_count_rows">{{ i }} ({{ stat }})</td>
+                        <td class="frequency_count_rows">{{ stat }} ({{ i }})</td>
                         {% for category in data.feature_interactions[f].statsbycategory[i].keys() %}
                         <td>{{ data.feature_interactions[f].statsbycategory[i][category][stat] }}</td>
                         {% endfor %}

@@ -319,7 +319,7 @@ class DataDriver:
             category_stats["Standard deviation"] = str("%.3f" % rows.std())
 
             # Add the stats for this category to the dictionary
-            stats_by_categories[category] = category_stats
+            stats_by_categories[str(category)] = category_stats
 
         stats_by_categories_ordered = OrderedDict(sorted(stats_by_categories.items()))
         return stats_by_categories_ordered
