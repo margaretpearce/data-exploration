@@ -302,6 +302,31 @@ class DataDriver:
 
         return freq_dictionary, str(colnames[0])
 
+    def get_stats_by_category(self, categorical_feature, continuous_feature):
+        unique_category_values = self.data[categorical_feature].unique()
+        stats_by_categories = {}
+
+        for category in unique_category_values:
+            category_stats = {}
+
+            # Get continuous values
+            rows = self.data.loc[self.data[categorical_feature] == category][continuous_feature]
+            category_stats["Maximum"] = float(rows.max())
+            category_stats["Median"] = float(rows.median())
+            category_stats["Mean"] = str("%.3f" % rows.mean())
+            category_stats["Minimum"] = float(rows.min())
+            category_stats["Skew"] = str("%.3f" % rows.skew())
+            category_stats["Standard deviation"] = str("%.3f" % rows.std())
+
+            # Add the stats for this category to the dictionary
+            stats_by_categories[category] = category_stats
+
+        stats_by_categories_ordered = OrderedDict(sorted(stats_by_categories.items()))
+        return stats_by_categories_ordered
+
+    def get_stats_by_category_list(self):
+        return ["Minimum", "Median", "Mean", "Maximum", "Standard deviation", "Skew"]
+
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
         if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
@@ -329,6 +354,8 @@ class DataDriver:
         if self.id_column in feature_names:
             feature_names.remove(self.id_column)
 
+        statsforcategory = self.get_stats_by_category_list()
+
         # For each feature, get as much relevant info as possible
         for base_feat in feature_names:
 
@@ -348,6 +375,7 @@ class DataDriver:
             correlations = {}
             covariances = {}
             boxplots = {}
+            statsbycategory = {}
             ztests = {}
             ttests = {}
             anova = {}
@@ -394,6 +422,8 @@ class DataDriver:
 
                     # Don't plot if too many unique values
                     if self.get_percent_unique(base_feat) < 0.2:
+                        statsbycategory[compare_feat] = self.get_stats_by_category(base_feat, compare_feat)
+
                         # box plot
                         boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y",
                                               data=self.data[[compare_feat, base_feat]])
@@ -482,6 +512,8 @@ class DataDriver:
                                       correlations=correlations,
                                       covariances=covariances,
                                       boxplots=boxplots,
+                                      statsbycategory=statsbycategory,
+                                      statsforcategory=statsforcategory,
                                       ztests=ztests,
                                       ttests=ttests,
                                       anova=anova,

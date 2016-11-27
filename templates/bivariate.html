@@ -74,6 +74,32 @@
             </div>
             {% endif %}
 
+            {% if data.feature_interactions[f].statsbycategory[i] %}
+            <h5>Statistics by Category</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for category in data.feature_interactions[f].statsbycategory[i].keys() %}
+                        <th class="frequency_count_cols">{{ f }} = {{ category }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for stat in data.feature_interactions[f].statsforcategory %}
+                    <tr>
+                        <td class="frequency_count_rows">{{ i }} ({{ stat }})</td>
+                        {% for category in data.feature_interactions[f].statsbycategory[i].keys() %}
+                        <td>{{ data.feature_interactions[f].statsbycategory[i][category][stat] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
             {% if data.feature_interactions[f].frequency_table[i] %}
             <h5>Frequencies</h5>
             <div class="table-responsive">
