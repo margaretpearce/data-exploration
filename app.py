@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, url_for
 from data_driver import DataDriver
 from datasets import DataSets
 from dataset import DataSet
@@ -101,14 +101,10 @@ def dataset_selection_changed():
         session["data_label"] = new_label
 
     # Redirect and reload the appropriate page
-    rule = request.url_rule
-
-    if '/univariate' in rule.rule:
-        return univariate()
-    elif '/bivariate' in rule.rule:
-        return bivariate()
+    if request.referrer is not None:
+        return redirect(request.referrer)
     else:
-        return index()
+        return redirect(url_for('index'))
 
 
 def datasetuploaded():
