@@ -31,7 +31,6 @@ class DataDriver:
     def load_data(self):
         # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
-            print("PATH: --------------------------" + self.filepath)
             self.data = pd.read_csv(self.filepath)
         elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
             self.data = pd.read_excel(self.filepath)
@@ -104,9 +103,9 @@ class DataDriver:
             var_unique = int(len(self.data[var_name].unique()))
 
             # Denote label and index, if applicable
-            if var_name == self.id_column:
+            if self.id_column != None and var_name == self.id_column:
                 var_vartype += " (ID)"
-            elif var_name == self.label_column:
+            elif self.label_column != None and var_name == self.label_column:
                 var_vartype += " (Label)"
 
             # Numeric only
@@ -258,7 +257,7 @@ class DataDriver:
     def get_variable_type(self, feat_name):
         # Get the variable type based on data type and heuristics
         var_datatype = self.get_data_type(feat_name)
-        var_vartype = None
+        var_vartype = const_types.VARTYPE_UNKNOWN
 
         # Variable type: categorical, continuous, binary
         if var_datatype == const_types.DATATYPE_BOOLEAN:

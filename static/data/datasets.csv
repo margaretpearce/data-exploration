@@ -1,4 +1,5 @@
 FileName,Title,ID,Label
 titanic.csv,Titanic,PassengerId,Survived
 iris.csv,Iris,ID,Species
-x.csv,t,x,y
+housesales.csv,HouseSales,id,
+pokemon.csv,Pokemon,#,Legendary
