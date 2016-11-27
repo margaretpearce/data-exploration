@@ -44,9 +44,14 @@
         <form action="dataset_selection_changed" method="post">
         <span class="custom-dropdown custom-dropdown--white">
             <select class="custom-dropdown__select custom-dropdown__select--white" name="data_set_field" onchange="this.form.submit()">
-                <option value="{{ data_file }}" selected="selected">{{ data_title }}</option>
-                <option value="titanic.csv">Titanic</option>
-                <option value="iris.csv">Iris</option>
+                {% for dataset in dataset_options.dataset_info %}
+                {% if dataset.dataset_file == data_file %}
+                    <option value="{{ dataset.dataset_file }}" selected="selected">{{ dataset.dataset_title }}</option>
+                {% else %}
+                    <option value="{{ dataset.dataset_file }}">{{ dataset.dataset_title }}</option>
+                {% endif %}
+                {% endfor %}
+                <!--<option value="{{ data_file }}" selected="selected">{{ data_title }}</option>-->
             </select>
         </span>
         <input type="text" name="data_title_field" value="{{ data_title }}" class="sampleDataField">

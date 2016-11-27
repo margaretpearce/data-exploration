@@ -7,6 +7,7 @@ EXAMPLES_FOLDER = os.path.join(APP_ROOT, EXAMPLES_RELATIVE)
 GRAPHS_SUBFOLDER = "/graphs/"
 
 DATASETS = os.path.join(EXAMPLES_FOLDER, "datasets.csv")
+DATASETS_JSON = os.path.join(EXAMPLES_FOLDER, "datasets.json")
 
 # Graph types
 FILE_BARCHART = "_bar.png"

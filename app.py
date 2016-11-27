@@ -1,9 +1,12 @@
 from flask import Flask, render_template, session, request
 from data_driver import DataDriver
+from datasets import DataSets
+from dataset import DataSet
 import paths
 import key
 import os
 import pandas as pd
+import jsonpickle
 
 app = Flask(__name__)
 
@@ -11,6 +14,37 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
 app.secret_key = key.SECRET_KEY
+
+@app.before_first_request
+def getmenu():
+    if not os.path.isfile(paths.DATASETS_JSON):
+        dataset_info = []
+
+        # Read in CSV
+        datasets_csv = pd.read_csv(paths.DATASETS)
+
+        # Get title, filename, id, and label for each data set and add it to the collection
+        for index, row in datasets_csv.iterrows():
+            dataset_title = row["Title"]
+            dataset_filename = row["FileName"]
+            dataset_id = row["ID"]
+            dataset_label = row["Label"]
+            dataset = DataSet(dataset_filename, dataset_title, dataset_id, dataset_label)
+            dataset_info.append(dataset)
+
+        # Save the collection as JSON and return it
+        datasets = DataSets(dataset_info=dataset_info)
+        datasets_json = jsonpickle.encode(datasets)
+
+        # Save the serialized JSON to a file
+        with open(paths.DATASETS_JSON, 'w') as file:
+            file.write(datasets_json)
+    else:
+         with open(paths.DATASETS_JSON, 'r') as serialized_file:
+            json_str = serialized_file.read()
+            datasets_json = jsonpickle.decode(json_str)
+
+    return datasets_json
 
 
 def selecteddataset():
@@ -50,7 +84,6 @@ def selecteddataset():
 def dataset_selection_changed():
     # Get the selected data set's name
     new_selection = str(request.form["data_set_field"])
-    print(new_selection)
 
     # Look up the Title, ID, Label (for existing data sets)
     datasets = pd.read_csv(paths.DATASETS)
@@ -89,10 +122,13 @@ def datasetuploaded():
 
     # Save the uploaded file to this directory
 
+    # Update the list of options to select from
+
 @app.route('/')
 @app.route('/index')
 def index():
     data_file, data_title, data_id, data_label = selecteddataset()
+    dataset_options = getmenu()
     driver = DataDriver(data_file, data_title, data_id, data_label)
 
     # Get the JSON for the summary data
@@ -103,12 +139,14 @@ def index():
                            data_file=data_file,
                            data_title=data_title,
                            data_id=data_id,
-                           data_label=data_label)
+                           data_label=data_label,
+                           dataset_options=dataset_options)
 
 
 @app.route('/univariate')
 def univariate():
     data_file, data_title, data_id, data_label = selecteddataset()
+    dataset_options = getmenu()
     driver = DataDriver(data_file, data_title, data_id, data_label)
 
     # Get the JSON for the summary data
@@ -119,13 +157,15 @@ def univariate():
                            data_file=data_file,
                            data_title=data_title,
                            data_id=data_id,
-                           data_label=data_label)
+                           data_label=data_label,
+                           dataset_options=dataset_options)
 
 
 @app.route('/bivariate')
 def bivariate():
     # Read Titanic data
     data_file, data_title, data_id, data_label = selecteddataset()
+    dataset_options = getmenu()
     driver = DataDriver(data_file, data_title, data_id, data_label)
 
     # Get the JSON for the summary data
@@ -136,4 +176,5 @@ def bivariate():
                            data_file=data_file,
                            data_title=data_title,
                            data_id=data_id,
-                           data_label=data_label)
+                           data_label=data_label,
+                           dataset_options=dataset_options)
