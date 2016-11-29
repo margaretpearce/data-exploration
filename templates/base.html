@@ -47,23 +47,23 @@
             <select class="custom-dropdown__select custom-dropdown__select--white" name="data_set_field" onchange="this.form.submit()">
                 {% for dataset in dataset_options.dataset_info %}
                 {% if dataset.dataset_file == data_file %}
-                    <option value="{{ dataset.dataset_file }}" selected="selected">Data set: {{ dataset.dataset_title }}</option>
+                <option value="{{ dataset.dataset_file }}" selected="selected">Data set: {{ dataset.dataset_title }}</option>
                 {% else %}
-                    <option value="{{ dataset.dataset_file }}">{{ dataset.dataset_title }}</option>
+                <option value="{{ dataset.dataset_file }}">{{ dataset.dataset_title }}</option>
                 {% endif %}
                 {% endfor %}
             </select>
         </span>
-        <input type="text" name="data_title_field" value="{{ data_title }}" class="sampleDataField">
-        <input type="text" name="data_index_field" value="{{ data_id }}" class="sampleDataField">
-        <input type="text" name="data_label_field" value="{{ data_label }}" class="sampleDataField">
-        <!--<input type="submit" value="Update">-->
+            <input type="text" name="data_title_field" value="{{ data_title }}" class="sampleDataField">
+            <input type="text" name="data_index_field" value="{{ data_id }}" class="sampleDataField">
+            <input type="text" name="data_label_field" value="{{ data_label }}" class="sampleDataField">
+            <!--<input type="submit" value="Update">-->
         </form>
     </div>
 </div>
 
-<!-- Fixed navbar -->
-<nav class="navbar tabs">
+<!-- Static navbar -->
+<nav class="navbar tabs navbar-default navbar-overrides">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -72,6 +72,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
+            <!--<a class="navbar-brand" href="#">Project name</a>-->
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -80,14 +81,14 @@
                 <li><a href="bivariate">Bi-variate Analysis</a></li>
             </ul>
         </div><!--/.nav-collapse -->
-    </div>
+    </div><!--/.container-fluid -->
 </nav>
 
 <div class="container theme-showcase" role="main">
 
     <!-- Page content -->
     <div id="tabcontent">
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
     </div>
 
 </div> <!-- /container -->
@@ -150,6 +151,11 @@
             $(feat_id).removeClass('table-hidden');
             $(graph_id).removeClass('table-hidden');
         });
+
+        // Show active tab
+        var url_parts = location.href.split('/');
+        var last_segment = url_parts[url_parts.length-1];
+        $('.navbar-nav a[href="' + last_segment + '"]').parents('li').addClass('active');
     });
 
 </script>

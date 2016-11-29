@@ -73,7 +73,7 @@ body {
 }
 
 .tabs {
-    background-color: #c9dada;
+    background-color: #c9dada !important;
     border-radius: 0px;
 }
 
@@ -140,6 +140,44 @@ body {
 
 .table {
 	table-layout: fixed;
+}
+
+.navbar-overrides {
+	background-color: #c9dada !important;
+	border: none;
+	background-image: none;
+	box-shadow: none;
+	-webkit-box-shadow: none;
+	background-repeat: none;
+	filter: none;
+}
+
+.navbar-overrides .navbar-nav > li > a {
+    color: #23527c;
+}
+
+.navbar-overrides .navbar-nav > .active > a, .navbar-overrides .navbar-nav > .active > a:focus, .navbar-overrides .navbar-nav > .active > a:hover {
+    background-color: #e8f1f1;
+    font-weight: bold;
+    background-image: none;
+    box-shadow: none;
+}
+
+.navbar-overrides .navbar-toggle .icon-bar {
+    background-color: #000;
+}
+
+.navbar-overrides .navbar-toggle {
+    border-color: #000;
+}
+
+.navbar-overrides .navbar-toggle:focus, .navbar-overrides .navbar-toggle:hover {
+    background-color: none;
+}
+
+.navbar-nav {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /*  Custom dropdown style from: Red Team Design
