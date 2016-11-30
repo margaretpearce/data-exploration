@@ -103,9 +103,9 @@ class DataDriver:
             var_unique = int(len(self.data[var_name].unique()))
 
             # Denote label and index, if applicable
-            if self.id_column != None and var_name == self.id_column:
+            if self.id_column is not None and var_name == self.id_column:
                 var_vartype += " (ID)"
-            elif self.label_column != None and var_name == self.label_column:
+            elif self.label_column is not None and var_name == self.label_column:
                 var_vartype += " (Label)"
 
             # Numeric only
@@ -145,11 +145,7 @@ class DataDriver:
                 var_skew = str("%.3f" % self.data[var_name].skew())
                 var_kurtosis = str("%.3f" % self.data[var_name].kurt())
 
-                mode = self.data[var_name].mode()
-                if mode is not None:
-                    var_mode = ""   # Show all values for the mode (in the event of a tie)
-                    for m in mode:
-                        var_mode = var_mode + str(m) + " "
+                var_mode = self.get_mode(var_name)
 
             # Compute non-numeric stats
             else:
@@ -231,6 +227,15 @@ class DataDriver:
         file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, FEATURES_SUFFIX), 'w')
         file.write(features_json)
         file.close()
+
+    def get_mode(self, feat_name):
+        var_mode = ""
+        mode = self.data[feat_name].mode()
+
+        if mode is not None:
+            for m in mode:
+                var_mode = var_mode + str(m) + " "
+        return var_mode
 
     def get_data_type(self, feat_name):
         raw_type = str(self.data[feat_name].dtype)

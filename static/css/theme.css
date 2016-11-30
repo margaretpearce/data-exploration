@@ -26,6 +26,9 @@ body {
     margin: auto;
     float: left;
 }
+.table {
+	table-layout: fixed;
+}
 }
 
 .panel-body-right {
@@ -95,6 +98,7 @@ body {
 	display: none;
 }
 
+@media (min-width: 768px) {
 .feature-tables {
 	float: left;
 	width: 50%;
@@ -103,6 +107,7 @@ body {
 .feature-graphs {
 	float: right;
 	width: 50%;
+}
 }
 
 .feature-graphs img {
@@ -136,10 +141,6 @@ body {
 
 .topbar-dropdown {
 	float: right;
-}
-
-.table {
-	table-layout: fixed;
 }
 
 .navbar-overrides {
