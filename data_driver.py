@@ -242,7 +242,7 @@ class DataDriver:
         var_datatype = None
 
         # Get the data type based on its raw type
-        if raw_type == "int64":
+        if raw_type == "int64" or raw_type == "int8":
             # Check if it's really a boolean
             unique_vals = self.data[feat_name].unique()
             for val in unique_vals:
@@ -250,7 +250,9 @@ class DataDriver:
                     var_datatype = const_types.DATATYPE_INTEGER
             if not var_datatype == const_types.DATATYPE_INTEGER:
                 var_datatype = const_types.DATATYPE_BOOLEAN
-        elif raw_type == "float64":
+        elif raw_type == "bool":
+            var_datatype = const_types.DATATYPE_BOOLEAN
+        elif raw_type == "float64" or raw_type == "float32":
             var_datatype = const_types.DATATYPE_FLOAT
         elif raw_type == "datetime64":
             var_datatype = const_types.DATATYPE_DATE
