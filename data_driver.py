@@ -495,7 +495,15 @@ class DataDriver:
                         chi_results = self.get_chisquared(base_feat, compare_feat)
                         if chi_results is not None:
                             (chi2, p, dof, ex) = chi_results
-                            chisq = str("%.3f (p-value: %.5f)" % (chi2, p))
+                            if p <= 0.001:
+                                p_sig = "p ≤ 0.001***"
+                            elif p <= 0.01:
+                                p_sig = "p ≤ 0.01**"
+                            elif p <= 0.05:
+                                p_sig = "p ≤ 0.05*"
+                            else:
+                                p_sig = "ns"
+                            chisq = str("%.3f, %s (p=%.7f)" % (chi2, p_sig, p))
                             chisquared[compare_feat] = chisq
 
                         # Cramer's V
