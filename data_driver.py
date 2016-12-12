@@ -346,7 +346,8 @@ class DataDriver:
             for category_value in unique_category_values:
                 # Get the statistic for this category value
                 stat_values[str(category_value)] = stats_by_categories[str(category_value)][stat]
-            stats_by_categories_flipped[stat] = stat_values
+            stat_values_ordered = OrderedDict(sorted(stat_values.items()))
+            stats_by_categories_flipped[stat] = stat_values_ordered
 
         return stats_by_categories_flipped
 
