@@ -334,6 +334,23 @@ class DataDriver:
     def get_stats_by_category_list(self):
         return ["Minimum", "Median", "Mean", "Maximum", "Standard deviation", "Skew"]
 
+    def get_stats_by_category_flipped(self, continuous_feature, categorical_feature):
+        unique_category_values = self.data[categorical_feature].unique()
+        stats_list = self.get_stats_by_category_list()
+
+        stats_by_categories = self.get_stats_by_category(categorical_feature, continuous_feature)
+        stats_by_categories_flipped = {}
+
+        for stat in stats_list:
+            stat_values = {}
+            for category_value in unique_category_values:
+                # Get the statistic for this category value
+                stat_values[str(category_value)] = stats_by_categories[str(category_value)][stat]
+            stats_by_categories_flipped[stat] = stat_values
+
+        return stats_by_categories_flipped
+
+
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
         if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
@@ -383,6 +400,7 @@ class DataDriver:
             covariances = {}
             boxplots = {}
             statsbycategory = {}
+            statsbycategoryflipped = {}
             ztests = {}
             ttests = {}
             anova = {}
@@ -453,6 +471,8 @@ class DataDriver:
 
                     # Don't plot if too many unique values
                     if self.get_percent_unique(compare_feat) < 0.2:
+                        statsbycategoryflipped[compare_feat] = self.get_stats_by_category_flipped(base_feat, compare_feat)
+
                         # Box plot
                         boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",
                                               data=self.data[[compare_feat, base_feat]])
@@ -528,6 +548,7 @@ class DataDriver:
                                       covariances=covariances,
                                       boxplots=boxplots,
                                       statsbycategory=statsbycategory,
+                                      statsbycategoryflipped=statsbycategoryflipped,
                                       statsforcategory=statsforcategory,
                                       ztests=ztests,
                                       ttests=ttests,

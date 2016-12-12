@@ -1,7 +1,7 @@
 class Interaction(object):
     def __init__(self, feat_name, feat_index, other_features=[None], scatterplots={}, correlations={}, covariances={},
-                 boxplots={}, statsbycategory={}, statsforcategory=[], ztests={}, ttests={}, anova={},
-                 stackedbarplots={}, chisquared={}, cramers={}, mantelhchi={}, frequency_table={},
+                 boxplots={}, statsbycategory={}, statsbycategoryflipped=[], statsforcategory=[], ztests={}, ttests={},
+                 anova={}, stackedbarplots={}, chisquared={}, cramers={}, mantelhchi={}, frequency_table={},
                  frequencytable_firstrow=None):
         # Feature comparing against all others in the data set
         self.feat_name = feat_name
@@ -16,6 +16,7 @@ class Interaction(object):
         # Categorical & continuous
         self.boxplots = boxplots
         self.statsbycategory = statsbycategory
+        self.statsbycategoryflipped = statsbycategoryflipped
         self.statsforcategory = statsforcategory
         self.ztests = ztests
         self.ttests = ttests

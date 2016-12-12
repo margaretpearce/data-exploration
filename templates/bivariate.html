@@ -100,6 +100,32 @@
             </div>
             {% endif %}
 
+            {% if data.feature_interactions[f].statsbycategoryflipped[i] %}
+            <h5>Statistics by Category</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for stat in data.feature_interactions[f].statsforcategory %}
+                        <th class="frequency_count_cols">{{ stat }} ({{ f }})</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for category in data.feature_interactions[f].statsbycategoryflipped[i]["Minimum"].keys() %}
+                    <tr>
+                        <th class="frequency_count_cols">{{ i }} = {{ category }}</th>
+                        {% for stat in data.feature_interactions[f].statsforcategory %}
+                        <td>{{ data.feature_interactions[f].statsbycategoryflipped[i][stat][category] }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
             {% if data.feature_interactions[f].frequency_table[i] %}
             <h5>Frequencies</h5>
             <div class="table-responsive">
