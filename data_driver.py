@@ -61,7 +61,7 @@ class DataDriver:
         features_list = list(self.data.columns.values)
         if "num_missing" in features_list:
             features_list.remove("num_missing")
-        sample_list = self.data.head()[features_list].values.tolist()
+        sample_list = self.data.sample(5)[features_list].values.tolist()
 
         summary = Summary(name=self.title,
                           num_records=num_records,

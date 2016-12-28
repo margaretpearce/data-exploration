@@ -3,3 +3,5 @@ titanic.csv,Titanic,PassengerId,Survived
 iris.csv,Iris,ID,Species
 housesales.csv,HouseSales,id,
 pokemon.csv,Pokemon,#,Legendary
+planets.csv,Planets,,
+tips.csv,Tips,,tip
