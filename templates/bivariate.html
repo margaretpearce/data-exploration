@@ -21,7 +21,6 @@
 <!-- Table with bivariate stats for selected variable against all others -->
 {% for f in data.feature_interactions.keys() %}
 <div id="interactions-{{ data.feature_interactions[f].feat_index }}" class="interactions-tables table-hidden">
-    <!--<h4>{{ data.feature_interactions[f].feat_name }}</h4>-->
     {% for i in data.feature_interactions[f].other_features %}
     {% if data.feature_interactions[f].correlations[i] or data.feature_interactions[f].covariances[i] or
                 data.feature_interactions[f].ttests[i] or data.feature_interactions[f].chisquared[i] or
@@ -185,10 +184,10 @@
             {% endif %}
         </div>
         <div style="clear: both;"></div>
-    </div> <!-- end container div -->
+    </div>
     <hr/>
     {% endif %}
     {% endfor %}
-</div> <!-- end feature div -->
+</div>
 {% endfor %}
 {% endblock %}
