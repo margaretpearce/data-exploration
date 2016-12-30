@@ -115,6 +115,15 @@ body {
 	height: 100%;
 }
 
+.singlecol-graphs {
+	display: flex;
+	justify-content: center;
+}
+
+.singlecol-graphs img {
+	max-width: 90%;
+}
+
 .frequency_count_cols {
 	font-style: italic;
 	font-weight: normal;
