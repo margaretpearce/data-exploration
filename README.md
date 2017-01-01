@@ -4,3 +4,15 @@ Reads in a CSV file with optionally specified index and label field, then presen
 
 Uses: pandas, scipy, numpy, seaborn, flask
 Supported data formats: csv, xls, xlsx, json
+
+
+To run locally:
+
+
+- Clone repo
+
+
+- export FLASK_APP=app.py
+
+
+- python -m flask run
