@@ -15,6 +15,7 @@ app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
 app.secret_key = key.SECRET_KEY
 
+
 @app.before_first_request
 def getmenu():
     if not os.path.isfile(paths.DATASETS_JSON):
@@ -24,7 +25,7 @@ def getmenu():
         datasets_csv = pd.read_csv(paths.DATASETS)
 
         # Get title, filename, id, and label for each data set and add it to the collection
-        for index, row in datasets_csv.iterrows():
+        for i, row in datasets_csv.iterrows():
             dataset_title = row["Title"]
             dataset_filename = row["FileName"]
             dataset_id = row["ID"]
@@ -40,7 +41,7 @@ def getmenu():
         with open(paths.DATASETS_JSON, 'w') as file:
             file.write(datasets_json)
     else:
-         with open(paths.DATASETS_JSON, 'r') as serialized_file:
+        with open(paths.DATASETS_JSON, 'r') as serialized_file:
             json_str = serialized_file.read()
             datasets_json = jsonpickle.decode(json_str)
 
@@ -117,8 +118,8 @@ def datasetuploaded():
         os.makedirs(os.path.join(data_path, "graphs"))
 
     # Save the uploaded file to this directory
-
     # Update the list of options to select from
+
 
 @app.route('/')
 @app.route('/index')

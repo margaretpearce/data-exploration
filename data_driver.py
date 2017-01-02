@@ -331,7 +331,8 @@ class DataDriver:
         stats_by_categories_ordered = OrderedDict(sorted(stats_by_categories.items()))
         return stats_by_categories_ordered
 
-    def get_stats_by_category_list(self):
+    @staticmethod
+    def get_stats_by_category_list():
         return ["Minimum", "Median", "Mean", "Maximum", "Standard deviation", "Skew"]
 
     def get_stats_by_category_flipped(self, continuous_feature, categorical_feature):
@@ -350,7 +351,6 @@ class DataDriver:
             stats_by_categories_flipped[stat] = stat_values_ordered
 
         return stats_by_categories_flipped
-
 
     def get_chisquared(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
@@ -472,7 +472,8 @@ class DataDriver:
 
                     # Don't plot if too many unique values
                     if self.get_percent_unique(compare_feat) < 0.2:
-                        statsbycategoryflipped[compare_feat] = self.get_stats_by_category_flipped(base_feat, compare_feat)
+                        statsbycategoryflipped[compare_feat] = \
+                            self.get_stats_by_category_flipped(base_feat, compare_feat)
 
                         # Box plot
                         boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",

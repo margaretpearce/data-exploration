@@ -1,5 +1,5 @@
 class Interactions(object):
-    def __init__(self, name, correlations_url=None, covariance_url=None, features=[], feature_interactions={}):
+    def __init__(self, name, features=None, feature_interactions=None):
         # Data set name
         self.name = name
 
