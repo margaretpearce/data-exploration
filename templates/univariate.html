@@ -90,6 +90,7 @@
         </tr>
         {% endif %}
         </table>
+    <p>Missing values excluded in calculations for mean and median</p>
 </div>
 {% endif %}
 
@@ -173,6 +174,10 @@
 
         <!-- outliers -->
     </table>
+    {% if f.feat_stddev %}
+    <p>Missing values excluded in calculations for standard deviation, variance, skew, and kurtosis<br/>
+        Standard deviation, variance, skew, and kurtosis normalized by n-1</p>
+    {% endif %}
 </div>
 <br/>
 </div>

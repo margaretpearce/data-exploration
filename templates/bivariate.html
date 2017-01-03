@@ -78,6 +78,9 @@
                     </tr>
                     {% endif %}
                     </table>
+                    {% if data.feature_interactions[f].chisquared[i] or data.feature_interactions[f].cramers[i] %}
+                    <p>Missing values excluded in calculations for Chi-Squared and Cramer's V</p>
+                    {% endif %}
             </div>
             {% endif %}
 
@@ -104,6 +107,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <p>Missing values excluded in calculations for median, mean, standard deviation, and skew<br/>
+                    Standard deviation and skew normalized by n-1</p>
             </div>
             {% endif %}
 
@@ -130,6 +135,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
+                <p>Missing values excluded in calculations for median, mean, standard deviation, and skew<br/>
+                    Standard deviation and skew normalized by n-1</p>
             </div>
             {% endif %}
 

@@ -142,6 +142,13 @@ body {
 
 }
 
+.table-responsive p {
+	margin-bottom: 25px;
+	font-style: italic;
+	font-weight: lighter;
+	font-size: 10pt;
+}
+
 .topbar-title {
 	float: left;
 	color: #ffffff;
