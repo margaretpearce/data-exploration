@@ -119,8 +119,12 @@
                     <thead>
                     <tr>
                         <th></th>
+                        <th colspan="{{ data.feature_interactions[f].statsforcategory|length }}" style="text-align: center;">{{ f }}</th>
+                    </tr>
+                    <tr>
+                        <th></th>
                         {% for stat in data.feature_interactions[f].statsforcategory %}
-                        <th class="frequency_count_cols">{{ stat }} ({{ f }})</th>
+                        <th class="frequency_count_cols">{{ stat }}</th>
                         {% endfor %}
                     </tr>
                     </thead>

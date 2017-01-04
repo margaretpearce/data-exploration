@@ -319,7 +319,7 @@ class DataDriver:
             # Get continuous values
             rows = self.data.loc[self.data[categorical_feature] == category][continuous_feature]
             category_stats["Maximum"] = float(rows.max())
-            category_stats["Median"] = float(rows.median())
+            category_stats["Median"] = str("%.3f" % rows.median())
             category_stats["Mean"] = str("%.3f" % rows.mean())
             category_stats["Minimum"] = float(rows.min())
             category_stats["Skew"] = str("%.3f" % rows.skew())
@@ -422,12 +422,12 @@ class DataDriver:
                 if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
                     # Correlation
-                    correlations[compare_feat] = float(self.data[[compare_feat, base_feat]]
-                                                       .corr()[compare_feat][base_feat])
+                    correlations[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
+                                                     .corr()[compare_feat][base_feat]))
 
                     # Covariance
-                    covariances[compare_feat] = float(self.data[[compare_feat, base_feat]]
-                                                      .cov()[compare_feat][base_feat])
+                    covariances[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
+                                                    .cov()[compare_feat][base_feat]))
 
                     # Scatter plot
                     scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
@@ -525,14 +525,12 @@ class DataDriver:
                                 p_sig = "p ≤ 0.05*"
                             else:
                                 p_sig = "ns"
-                            chisq = str("%.3f, %s (p=%.7f)" % (chi2, p_sig, p))
-                            chisquared[compare_feat] = chisq
+                            chisquared[compare_feat] = str("%.3f, %s (p=%.7f)" % (chi2, p_sig, p))
 
                         # Cramer's V
                         cramersvstat = self.get_cramersv(base_feat, compare_feat)
                         if cramersvstat is not None:
-                            cramersv = str(cramersvstat)
-                            cramers[compare_feat] = cramersv
+                            cramers[compare_feat] = str("%.3f" % cramersvstat)
 
                     # Display frequency table, limit number of results
                     if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
