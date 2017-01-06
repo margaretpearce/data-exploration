@@ -28,30 +28,27 @@
     </table>
 </div>
 
+{% if data.rows_missing %}
 <h3>Missing data</h3>
 <div class="table-responsive">
     <table class="table table-striped">
+        <thead>
+            <th>Number of missing features</th>
+            <th>Number of applicable rows</th>
+        </thead>
         <tbody>
+        {% for num_missing in data.rows_missing.keys() %}
         <tr>
-            <td>Number of rows with no missing data</td>
-            <td>{{ data.rows_no_missing }}</td>
+            <td>{{ num_missing }} missing features</td>
+            <td>{{ data.rows_missing[num_missing] }} rows</td>
         </tr>
-        <tr>
-            <td>Number of rows with one missing feature</td>
-            <td>{{ data.rows_one_missing }}</td>
-        </tr>
-        <tr>
-            <td>Number of rows with two missing features</td>
-            <td>{{ data.rows_two_missing }}</td>
-        </tr>
-        <tr>
-            <td>Number of rows with three or more missing features</td>
-            <td>{{ data.rows_three_more_missing }}</td>
-        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
+{% endif %}
 
+{% if data.sample_list %}
 <h3>Sample rows</h3>
 <div class="table-responsive">
     <table class="table table-striped">
@@ -73,5 +70,6 @@
         </tbody>
     </table>
 </div>
+{% endif %}
 
 {% endblock %}

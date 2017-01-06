@@ -52,10 +52,21 @@ class DataDriver:
         count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis=1)
         self.data["num_missing"] = pd.Series(count_missing)
 
-        num_rows_no_missing = int(sum(self.data["num_missing"] == 0))
-        num_rows_one_missing = int(sum(self.data["num_missing"] == 1))
-        num_rows_two_missing = int(sum(self.data["num_missing"] == 2))
-        num_rows_three_more_missing = int(sum(self.data["num_missing"] >= 3))
+        num_rows_missing = {}
+        cumulative_row_sum = 0
+
+        for i in range(0, num_records):
+            # Count the number of missing rows and add it to the list
+            num_rows_i_missing = int(sum(self.data["num_missing"] == i))
+            num_rows_missing[i] = num_rows_i_missing
+            cumulative_row_sum += num_rows_i_missing
+
+            # If we reached the point where we have accounted for all rows, stop looking for rows
+            if cumulative_row_sum == num_records:
+                break
+
+        # Sort the dictionary
+        num_rows_missing = OrderedDict(sorted(num_rows_missing.items()))
 
         # Sample data (five rows)
         features_list = list(self.data.columns.values)
@@ -68,10 +79,7 @@ class DataDriver:
                           num_features=num_features,
                           index_column=index_column,
                           label_column=label_column,
-                          rows_no_missing=num_rows_no_missing,
-                          rows_one_missing=num_rows_one_missing,
-                          rows_two_missing=num_rows_two_missing,
-                          rows_three_more_missing=num_rows_three_more_missing,
+                          rows_missing=num_rows_missing,
                           features_list=features_list,
                           sample_list=sample_list
                           )
