@@ -2,28 +2,38 @@
 {% block content %}
 
 <!--Data set title-->
+{% if data.name %}
 <h3>Data summary: {{ data.name }}</h3>
+{% endif %}
 
 <!-- Summary stats about the data set -->
 <div class="table-responsive">
     <table class="table table-striped">
         <tbody>
+        {% if data.num_records %}
         <tr>
             <td>Number of records</td>
             <td>{{ data.num_records }}</td>
         </tr>
+        {% endif %}
+        {% if data.num_features %}
         <tr>
             <td>Number of features</td>
             <td>{{ data.num_features }}</td>
         </tr>
+        {% endif %}
+        {% if data.index_column != "nan" %}
          <tr>
             <td>Index column</td>
             <td>{{ data.index_column }}</td>
         </tr>
+        {% endif %}
+        {% if data.label_column != "nan" %}
          <tr>
             <td>Label column</td>
             <td>{{ data.label_column }}</td>
         </tr>
+        {% endif %}
         </tbody>
     </table>
 </div>
