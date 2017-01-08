@@ -99,6 +99,23 @@ body {
 }
 
 @media (min-width: 768px) {
+#fileUploadDiv {
+    max-width: 1000px;
+    margin: auto;
+}
+}
+
+#fileUploadDiv input[type='submit'] {
+    margin: auto;
+    display: block;
+    width: 50%;
+}
+
+#fileUploadDiv input[type='text'] {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
 .feature-tables {
 	float: left;
 	width: 50%;
