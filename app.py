@@ -160,7 +160,6 @@ def univariate():
 
 @app.route('/bivariate')
 def bivariate():
-    # Read Titanic data
     data_file, data_title, data_id, data_label = selecteddataset()
     dataset_options = getmenu()
     driver = DataDriver(data_file, data_title, data_id, data_label)
@@ -175,3 +174,8 @@ def bivariate():
                            data_id=data_id,
                            data_label=data_label,
                            dataset_options=dataset_options)
+
+@app.route('/upload')
+def upload():
+    dataset_options = getmenu()
+    return render_template('upload.html', dataset_options=dataset_options)

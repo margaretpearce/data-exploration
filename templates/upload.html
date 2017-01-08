@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Upload a data set</h3>
+
+<div id="fileUploadDiv">
+    <form action="upload" method="post" enctype="multipart/form-data">
+        <table class="table table-striped">
+            <tr>
+               <td colspan="2">
+                   <input type="file" name="file">
+               </td>
+            </tr>
+            <tr>
+                <td>
+                    Title
+                </td>
+                <td>
+                    <input type="text" name="title">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    ID column name
+                </td>
+                <td>
+                    <input type="text" name="id">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Label column name
+                </td>
+                <td>
+                    <input type="text" name="label">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" value="Upload">
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+{% endblock %}

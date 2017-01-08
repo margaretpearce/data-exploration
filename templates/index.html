@@ -22,13 +22,13 @@
             <td>{{ data.num_features }}</td>
         </tr>
         {% endif %}
-        {% if data.index_column != "nan" %}
+        {% if data.index_column and data.index_column != nan %}
          <tr>
             <td>Index column</td>
             <td>{{ data.index_column }}</td>
         </tr>
         {% endif %}
-        {% if data.label_column != "nan" %}
+        {% if data.label_column and data.label_column != nan %}
          <tr>
             <td>Label column</td>
             <td>{{ data.label_column }}</td>
