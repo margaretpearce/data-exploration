@@ -32,6 +32,8 @@ class DataDriver:
         # Load the data into a Pandas DataFrame
         if str(self.file).endswith("csv"):
             self.data = pd.read_csv(self.filepath)
+        elif str(self.file).endswith("tsv"):
+            self.data = pd.read_csv(self.filepath, sep='\t')
         elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
             self.data = pd.read_excel(self.filepath)
         elif str(self.file).endswith("json"):

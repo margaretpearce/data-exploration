@@ -10,10 +10,11 @@ import jsonpickle
 
 app = Flask(__name__)
 
-# Path information
+# Path and upload information
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
 app.secret_key = key.SECRET_KEY
+ALLOWED_EXTENSIONS = set(['csv', 'json', 'xls', 'xlsx', 'tsv'])
 
 
 @app.before_first_request
