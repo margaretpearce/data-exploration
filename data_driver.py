@@ -70,11 +70,16 @@ class DataDriver:
         # Sort the dictionary
         num_rows_missing = OrderedDict(sorted(num_rows_missing.items()))
 
-        # Sample data (five rows)
+        # Sample data (five rows or less)
         features_list = list(self.data.columns.values)
         if "num_missing" in features_list:
             features_list.remove("num_missing")
-        sample_list = self.data.sample(5)[features_list].values.tolist()
+
+        num_samples = 5
+        if num_records < num_samples:
+            num_samples = num_records
+
+        sample_list = self.data.sample(num_samples)[features_list].values.tolist()
 
         summary = Summary(name=self.title,
                           num_records=num_records,
