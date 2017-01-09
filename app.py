@@ -1,4 +1,5 @@
-from flask import Flask, render_template, session, request, redirect, url_for
+from flask import Flask, flash, render_template, session, request, redirect, url_for, send_from_directory
+from werkzeug.utils import secure_filename
 from data_driver import DataDriver
 from datasets import DataSets
 from dataset import DataSet
@@ -14,7 +15,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
 app.secret_key = key.SECRET_KEY
-ALLOWED_EXTENSIONS = set(['csv', 'json', 'xls', 'xlsx', 'tsv'])
+ALLOWED_EXTENSIONS = ['csv', 'json', 'xls', 'xlsx', 'tsv']
 
 
 @app.before_first_request
@@ -109,17 +110,78 @@ def dataset_selection_changed():
         return redirect(url_for('index'))
 
 
-def datasetuploaded():
-    data_file, data_title, data_id, data_label = selecteddataset()
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    # Create folder with graphs subfolder
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # Check if a file was passed into the request
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        # Get the uploaded file
+        file = request.files['file']
+
+        # Check if a file was not selected
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        # If the file was uploaded and is an allowed type, proceed with upload
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+
+            data_title = ""
+            data_id = ""
+            data_label = ""
+
+            if "label" in request.form:
+                data_title = request.form["title"]
+            if "id" in request.form:
+                data_id = request.form["id"]
+            if "label" in request.form:
+                data_label = request.form["label"]
+
+            # Move the file and set metadata
+            datasetuploaded(uploaded_file_path=str(filepath),
+                            data_title=data_title,
+                            data_id=data_id,
+                            data_label=data_label)
+
+            return redirect(url_for('index'))
+    else:
+        dataset_options = getmenu()
+        return render_template('upload.html', dataset_options=dataset_options)
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'],
+                               filename)
+
+
+def datasetuploaded(uploaded_file_path, data_title, data_id=None, data_label=None):
+    # Create folder with graphs sub folder
     data_path = os.path.join(paths.EXAMPLES_FOLDER, data_title)
     if not os.path.exists(data_path):
         os.makedirs(data_path)
         os.makedirs(os.path.join(data_path, "graphs"))
 
-    # Save the uploaded file to this directory
+    # Move the uploaded file to this directory
+    file_name = uploaded_file_path.split("/")[-1]
+    os.rename(uploaded_file_path, str(data_path + "/" + file_name))
+
     # Update the list of options to select from
+    session["data_file"] = file_name
+    session["data_title"] = data_title
+    session["data_id"] = data_id
+    session["data_label"] = data_label
 
 
 @app.route('/')
@@ -175,8 +237,3 @@ def bivariate():
                            data_id=data_id,
                            data_label=data_label,
                            dataset_options=dataset_options)
-
-@app.route('/upload')
-def upload():
-    dataset_options = getmenu()
-    return render_template('upload.html', dataset_options=dataset_options)
