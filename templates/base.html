@@ -41,6 +41,7 @@
         <form action="dataset_selection_changed" method="post" class="topbar-dropdown">
         <span class="custom-dropdown custom-dropdown--white">
             <select class="custom-dropdown__select custom-dropdown__select--white" name="data_set_field" onchange="this.form.submit()">
+
                 {% for dataset in dataset_options.dataset_info %}
                 {% if dataset.dataset_file == data_file %}
                 <option value="{{ dataset.dataset_file }}" selected="selected">Data set: {{ dataset.dataset_title }}</option>
@@ -48,6 +49,13 @@
                 <option value="{{ dataset.dataset_file }}">{{ dataset.dataset_title }}</option>
                 {% endif %}
                 {% endfor %}
+
+                {% if uploaded_dataset and uploaded_dataset[0] != data_file %}
+                <option value="{{ uploaded_dataset[0] }}">--Uploaded: {{ uploaded_dataset[1] }}</option>
+                {% elif uploaded_dataset and uploaded_dataset[0] == data_file %}
+                <option value="{{ uploaded_dataset[0] }}" selected="selected">--Uploaded: {{ uploaded_dataset[1] }}</option>
+                {% endif %}
+
             </select>
         </span>
         </form>

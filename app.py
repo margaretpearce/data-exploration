@@ -154,6 +154,7 @@ def upload_file():
                             data_id=data_id,
                             data_label=data_label)
 
+            # Return to the summary page and show the new data set info
             return redirect(url_for('index'))
     else:
         dataset_options = getmenu()
@@ -183,6 +184,32 @@ def datasetuploaded(uploaded_file_path, data_title, data_id=None, data_label=Non
     session["data_id"] = data_id
     session["data_label"] = data_label
 
+    # Set the uploaded one
+    session["data_file_uploaded"] = file_name
+    session["data_title_uploaded"] = data_title
+    session["data_id_uploaded"] = data_id
+    session["data_label_uploaded"] = data_label
+
+
+def getuploadeddataset():
+    data_file = None
+    data_title = None
+    data_id = None
+    data_label = None
+
+    if "data_file_uploaded" in session:
+        data_file = session["data_file_uploaded"]
+    if "data_title_uploaded" in session:
+        data_title = session["data_title_uploaded"]
+    if "data_id_uploaded" in session:
+        data_id = session["data_id_uploaded"]
+    if "data_label_uploaded" in session:
+        data_label = session["data_label_uploaded"]
+
+    if data_file is not None and data_title is not None:
+        return [data_file, data_title, data_id, data_label]
+
+    return None
 
 @app.route('/')
 @app.route('/index')
@@ -190,6 +217,7 @@ def index():
     # data_file, data_title, data_id, data_label = selecteddataset()
     selected_dataset = selecteddataset()
     dataset_options = getmenu()
+    uploaded_dataset = getuploadeddataset()
 
     driver = DataDriver(selected_dataset)
 
@@ -199,13 +227,15 @@ def index():
     return render_template('index.html',
                            data=summary_json,
                            data_file=selected_dataset[0],
-                           dataset_options=dataset_options)
+                           dataset_options=dataset_options,
+                           uploaded_dataset=uploaded_dataset)
 
 
 @app.route('/univariate')
 def univariate():
     selected_dataset = selecteddataset()
     dataset_options = getmenu()
+    uploaded_dataset = getuploadeddataset()
 
     driver = DataDriver(selected_dataset)
 
@@ -215,13 +245,15 @@ def univariate():
     return render_template('univariate.html',
                            mydata=features_json,
                            data_file=selected_dataset[0],
-                           dataset_options=dataset_options)
+                           dataset_options=dataset_options,
+                           uploaded_dataset=uploaded_dataset)
 
 
 @app.route('/bivariate')
 def bivariate():
     selected_dataset = selecteddataset()
     dataset_options = getmenu()
+    uploaded_dataset = getuploadeddataset()
 
     driver = DataDriver(selected_dataset)
 
@@ -231,4 +263,5 @@ def bivariate():
     return render_template('bivariate.html',
                            data=interactions_json,
                            data_file=selected_dataset[0],
-                           dataset_options=dataset_options)
+                           dataset_options=dataset_options,
+                           uploaded_dataset=uploaded_dataset)
