@@ -20,12 +20,12 @@ INTERACTIONS_SUFFIX = "interactions.json"
 
 
 class DataDriver:
-    def __init__(self, datafile, title, idcolumn=None, labelcolumn=None):
-        self.file = datafile
-        self.title = str(title)
+    def __init__(self, selected_dataset):
+        self.file = selected_dataset[0]
+        self.title = selected_dataset[1]
         self.filepath = os.path.join(paths.EXAMPLES_FOLDER, self.title, str(self.file))
-        self.id_column = idcolumn
-        self.label_column = labelcolumn
+        self.id_column = selected_dataset[2]
+        self.label_column = selected_dataset[3]
         self.data = None
 
     def load_data(self):

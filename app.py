@@ -80,7 +80,7 @@ def selecteddataset():
         session["data_id"] = data_id
         session["data_label"] = data_label
 
-    return data_file, data_title, data_id, data_label
+    return [data_file, data_title, data_id, data_label]
 
 
 @app.route('/dataset_selection_changed', methods=['POST'])
@@ -187,53 +187,48 @@ def datasetuploaded(uploaded_file_path, data_title, data_id=None, data_label=Non
 @app.route('/')
 @app.route('/index')
 def index():
-    data_file, data_title, data_id, data_label = selecteddataset()
+    # data_file, data_title, data_id, data_label = selecteddataset()
+    selected_dataset = selecteddataset()
     dataset_options = getmenu()
-    driver = DataDriver(data_file, data_title, data_id, data_label)
+
+    driver = DataDriver(selected_dataset)
 
     # Get the JSON for the summary data
     summary_json = driver.load_summary_json()
 
     return render_template('index.html',
                            data=summary_json,
-                           data_file=data_file,
-                           data_title=data_title,
-                           data_id=data_id,
-                           data_label=data_label,
+                           data_file=selected_dataset[0],
                            dataset_options=dataset_options)
 
 
 @app.route('/univariate')
 def univariate():
-    data_file, data_title, data_id, data_label = selecteddataset()
+    selected_dataset = selecteddataset()
     dataset_options = getmenu()
-    driver = DataDriver(data_file, data_title, data_id, data_label)
+
+    driver = DataDriver(selected_dataset)
 
     # Get the JSON for the summary data
     features_json = driver.load_features_json()
 
     return render_template('univariate.html',
                            mydata=features_json,
-                           data_file=data_file,
-                           data_title=data_title,
-                           data_id=data_id,
-                           data_label=data_label,
+                           data_file=selected_dataset[0],
                            dataset_options=dataset_options)
 
 
 @app.route('/bivariate')
 def bivariate():
-    data_file, data_title, data_id, data_label = selecteddataset()
+    selected_dataset = selecteddataset()
     dataset_options = getmenu()
-    driver = DataDriver(data_file, data_title, data_id, data_label)
+
+    driver = DataDriver(selected_dataset)
 
     # Get the JSON for the summary data
     interactions_json = driver.load_interactions_json()
 
     return render_template('bivariate.html',
                            data=interactions_json,
-                           data_file=data_file,
-                           data_title=data_title,
-                           data_id=data_id,
-                           data_label=data_label,
+                           data_file=selected_dataset[0],
                            dataset_options=dataset_options)
