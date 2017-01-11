@@ -51,6 +51,30 @@ class DataDriver:
         label_column = self.label_column
 
         # Count the number of columns missing for each row
+        num_rows_missing = self.count_missing(num_records)
+
+        # List of features
+        features_list = list(self.data.columns.values)
+
+        # Sample data (five rows or less)
+        sample_list = self.get_sample(num_records, features_list)
+
+        summary = Summary(name=self.title,
+                          num_records=num_records,
+                          num_features=num_features,
+                          index_column=index_column,
+                          label_column=label_column,
+                          rows_missing=num_rows_missing,
+                          features_list=features_list,
+                          sample_list=sample_list
+                          )
+        summary_json = jsonpickle.encode(summary)
+
+        # Save the serialized JSON to a file
+        self.save_json(json_to_write=summary_json, suffix=SUMMARY_SUFFIX)
+
+    def count_missing(self, num_records):
+        # Count the number of columns missing for each row
         count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis=1)
         self.data["num_missing"] = pd.Series(count_missing)
 
@@ -70,32 +94,18 @@ class DataDriver:
         # Sort the dictionary
         num_rows_missing = OrderedDict(sorted(num_rows_missing.items()))
 
-        # Sample data (five rows or less)
-        features_list = list(self.data.columns.values)
-        if "num_missing" in features_list:
-            features_list.remove("num_missing")
+        # Remove the added column
+        self.data.drop("num_missing", axis=1, inplace=True)
 
+        return num_rows_missing
+
+    def get_sample(self, num_records, features_list):
         num_samples = 5
         if num_records < num_samples:
             num_samples = num_records
 
         sample_list = self.data.sample(num_samples)[features_list].values.tolist()
-
-        summary = Summary(name=self.title,
-                          num_records=num_records,
-                          num_features=num_features,
-                          index_column=index_column,
-                          label_column=label_column,
-                          rows_missing=num_rows_missing,
-                          features_list=features_list,
-                          sample_list=sample_list
-                          )
-        summary_json = jsonpickle.encode(summary)
-
-        # Save the serialized JSON to a file
-        file = open(os.path.join(paths.EXAMPLES_FOLDER, str(self.title), SUMMARY_SUFFIX), 'w')
-        file.write(summary_json)
-        file.close()
+        return sample_list
 
     def generate_features_json(self):
         # Check if the data file exists, and if so, load the data as needed
@@ -239,9 +249,7 @@ class DataDriver:
         features_json = jsonpickle.encode(features)
 
         # Save the serialized JSON to a file
-        file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, FEATURES_SUFFIX), 'w')
-        file.write(features_json)
-        file.close()
+        self.save_json(json_to_write=features_json, suffix=FEATURES_SUFFIX)
 
     def get_mode(self, feat_name):
         var_mode = ""
@@ -250,6 +258,10 @@ class DataDriver:
         if mode is not None:
             for m in mode:
                 var_mode = var_mode + str(m) + " "
+
+        if var_mode == "":
+            var_mode = None
+
         return var_mode
 
     def get_data_type(self, feat_name):
@@ -586,8 +598,11 @@ class DataDriver:
         interactions_json = jsonpickle.encode(interactions)
 
         # Save the serialized JSON to a file
-        file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, INTERACTIONS_SUFFIX), 'w')
-        file.write(interactions_json)
+        self.save_json(json_to_write=interactions_json, suffix=INTERACTIONS_SUFFIX)
+
+    def save_json(self, json_to_write, suffix):
+        file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, suffix), 'w')
+        file.write(json_to_write)
         file.close()
 
     def load_summary_json(self):

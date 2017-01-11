@@ -71,19 +71,19 @@
             </th>
         </tr>
         </thead>
-        {% if f.feat_average %}
+        {% if f.feat_average is not none %}
         <tr>
             <td>Mean</td>
             <td>{{ f.feat_average }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_median %}
+        {% if f.feat_median is not none %}
         <tr>
             <td>Median</td>
             <td>{{ f.feat_median }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_mode %}
+        {% if f.feat_mode is not none %}
         <tr>
             <td>Mode</td>
             <td>{{ f.feat_mode }}</td>
@@ -103,55 +103,55 @@
             </th>
         </tr>
         </thead>
-        {% if f.feat_stddev %}
+        {% if f.feat_stddev is not none %}
         <tr>
             <td>Standard deviation</td>
             <td>{{ f.feat_stddev }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_variance %}
+        {% if f.feat_variance is not none %}
         <tr>
             <td>Variance</td>
             <td>{{ f.feat_variance }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_min %}
+        {% if f.feat_min is not none %}
         <tr>
             <td>Min</td>
             <td>{{ f.feat_min }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_quantile_25 %}
+        {% if f.feat_quantile_25 is not none %}
         <tr>
             <td>25%</td>
             <td>{{ f.feat_quantile_25 }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_quantile_75 %}
+        {% if f.feat_quantile_75 is not none %}
         <tr>
             <td>75%</td>
             <td>{{ f.feat_quantile_75 }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_quantile_75 %}
+        {% if f.feat_quantile_75 is not none %}
         <tr>
             <td>Interquartile range</td>
             <td>{{ f.feat_iqr }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_max %}
+        {% if f.feat_max is not none %}
         <tr>
             <td>Max</td>
             <td>{{ f.feat_max }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_skew %}
+        {% if f.feat_skew is not none %}
         <tr>
             <td>Skew</td>
             <td>{{ f.feat_skew }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_kurtosis %}
+        {% if f.feat_kurtosis is not none %}
         <tr>
             <td>Kurtosis</td>
             <td>{{ f.feat_kurtosis }}</td>
@@ -159,13 +159,13 @@
         {% endif %}
 
         <!-- Categorical only -->
-        {% if f.feat_mostcommon %}
+        {% if f.feat_mostcommon is not none %}
         <tr>
             <td>Most common value</td>
             <td>{{ f.feat_mostcommon }}</td>
         </tr>
         {% endif %}
-        {% if f.feat_leastcommon %}
+        {% if f.feat_leastcommon is not none %}
         <tr>
             <td>Least common value</td>
             <td>{{ f.feat_leastcommon }}</td>
@@ -174,7 +174,7 @@
 
         <!-- outliers -->
     </table>
-    {% if f.feat_stddev %}
+    {% if f.feat_stddev is not none %}
     <p>Missing values excluded in calculations for standard deviation, variance, skew, and kurtosis<br/>
         Standard deviation, variance, skew, and kurtosis normalized by n-1</p>
     {% endif %}
@@ -186,12 +186,12 @@
 <div id="graphs">
     {% for f in mydata.features %}
         <div id="graph-{{ f.feat_index }}" class="feature-graphs table-hidden">
-            {% if f.graph_histogram %}
+            {% if f.graph_histogram is not none %}
             <h4>Histogram</h4>
             <img src="{{ f.graph_histogram }}" />
             {% endif %}
 
-            {% if f.graph_countplot %}
+            {% if f.graph_countplot is not none %}
             <h4>Count plot</h4>
             <img src="{{ f.graph_countplot }}" />
             {% endif %}
