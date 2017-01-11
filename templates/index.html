@@ -10,25 +10,25 @@
 <div class="table-responsive">
     <table class="table table-striped">
         <tbody>
-        {% if data.num_records %}
+        {% if data.num_records is not none %}
         <tr>
             <td>Number of records</td>
             <td>{{ data.num_records }}</td>
         </tr>
         {% endif %}
-        {% if data.num_features %}
+        {% if data.num_features is not none %}
         <tr>
             <td>Number of features</td>
             <td>{{ data.num_features }}</td>
         </tr>
         {% endif %}
-        {% if data.index_column and data.index_column != nan %}
+        {% if data.index_column is not none %}
          <tr>
             <td>Index column</td>
             <td>{{ data.index_column }}</td>
         </tr>
         {% endif %}
-        {% if data.label_column and data.label_column != nan %}
+        {% if data.label_column is not none %}
          <tr>
             <td>Label column</td>
             <td>{{ data.label_column }}</td>
@@ -38,7 +38,7 @@
     </table>
 </div>
 
-{% if data.rows_missing %}
+{% if data.rows_missing is not none %}
 <h3>Missing data</h3>
 <div class="table-responsive">
     <table class="table table-striped">
@@ -58,7 +58,7 @@
 </div>
 {% endif %}
 
-{% if data.sample_list %}
+{% if data.sample_list is not none %}
 <h3>Sample rows</h3>
 <div class="table-responsive">
     <table class="table table-striped">

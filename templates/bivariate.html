@@ -47,44 +47,45 @@
             <h5>Statistics</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
-                    {% if data.feature_interactions[f].correlations[i] %}
+                    {% if data.feature_interactions[f].correlations[i] is not none %}
                     <tr>
                         <td>Correlation</td>
                         <td>{{ data.feature_interactions[f].correlations[i] }}</td>
                     </tr>
                     {% endif %}
-                    {% if data.feature_interactions[f].covariances[i] %}
+                    {% if data.feature_interactions[f].covariances[i] is not none %}
                     <tr>
                         <td>Covariance</td>
                         <td>{{ data.feature_interactions[f].covariances[i] }}</td>
                     </tr>
                     {% endif %}
-                    {% if data.feature_interactions[f].ttests[i] %}
+                    {% if data.feature_interactions[f].ttests[i] is not none %}
                     <tr>
                         <td>T-test</td>
                         <td>{{ data.feature_interactions[f].ttests[i] }}</td>
                     </tr>
                     {% endif %}
-                    {% if data.feature_interactions[f].chisquared[i] %}
+                    {% if data.feature_interactions[f].chisquared[i] is not none %}
                     <tr>
                         <td>Chi-Squared</td>
                         <td>{{ data.feature_interactions[f].chisquared[i] }}</td>
                     </tr>
                     {% endif %}
-                    {% if data.feature_interactions[f].cramers[i] %}
+                    {% if data.feature_interactions[f].cramers[i] is not none %}
                     <tr>
                         <td>Cramer's V</td>
                         <td>{{ data.feature_interactions[f].cramers[i] }}</td>
                     </tr>
                     {% endif %}
                     </table>
-                    {% if data.feature_interactions[f].chisquared[i] or data.feature_interactions[f].cramers[i] %}
+                    {% if data.feature_interactions[f].chisquared[i] is not none or
+                          data.feature_interactions[f].cramers[i] is not none %}
                     <p>Missing values excluded in calculations for Chi-Squared and Cramer's V</p>
                     {% endif %}
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].statsbycategory[i] %}
+            {% if data.feature_interactions[f].statsbycategory[i] is not none %}
             <h5>Statistics by Category</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -112,7 +113,7 @@
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].statsbycategoryflipped[i] %}
+            {% if data.feature_interactions[f].statsbycategoryflipped[i] is not none %}
             <h5>Statistics by Category</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -144,7 +145,7 @@
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].frequency_table[i] %}
+            {% if data.feature_interactions[f].frequency_table[i] is not none %}
             <h5>Frequencies</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
