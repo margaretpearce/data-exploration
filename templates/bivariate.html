@@ -85,7 +85,7 @@
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].statsbycategory[i] is not none %}
+            {% if data.feature_interactions[f].statsbycategory[i] %}
             <h5>Statistics by Category</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -113,7 +113,7 @@
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].statsbycategoryflipped[i] is not none %}
+            {% if data.feature_interactions[f].statsbycategoryflipped[i] %}
             <h5>Statistics by Category</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -145,7 +145,7 @@
             </div>
             {% endif %}
 
-            {% if data.feature_interactions[f].frequency_table[i] is not none %}
+            {% if data.feature_interactions[f].frequency_table[i] %}
             <h5>Frequencies</h5>
             <div class="table-responsive">
                 <table class="table table-striped">
