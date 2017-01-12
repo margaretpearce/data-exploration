@@ -8,3 +8,7 @@ VARTYPE_BINARY = "Binary"
 VARTYPE_CATEGORICAL = "Categorical"
 VARTYPE_CONTINUOUS = "Continuous"
 VARTYPE_UNKNOWN = "Unknown"
+
+SUMMARY_SUFFIX = "summary.json"
+FEATURES_SUFFIX = "features.json"
+INTERACTIONS_SUFFIX = "interactions.json"

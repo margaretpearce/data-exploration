@@ -1,22 +1,20 @@
 import os
-import jsonpickle
-import pandas as pd
-import numpy as np
-import seaborn as sns
-from scipy.stats import chi2_contingency
 from collections import OrderedDict
 
-from summary import Summary
-from interactions import Interactions
-from interaction import Interaction
-from feature import Feature
-from features import Features
-import paths
-import const_types
+import jsonpickle
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from scipy.stats import chi2_contingency
 
-SUMMARY_SUFFIX = "summary.json"
-FEATURES_SUFFIX = "features.json"
-INTERACTIONS_SUFFIX = "interactions.json"
+import const_types
+import paths
+
+from model.feature import Feature
+from model.features import Features
+from model.summary import Summary
+from model.interaction import Interaction
+from model.interactions import Interactions
 
 
 class DataDriver:
@@ -71,7 +69,7 @@ class DataDriver:
         summary_json = jsonpickle.encode(summary)
 
         # Save the serialized JSON to a file
-        self.save_json(json_to_write=summary_json, suffix=SUMMARY_SUFFIX)
+        self.save_json(json_to_write=summary_json, suffix=const_types.SUMMARY_SUFFIX)
 
     def count_missing(self, num_records):
         # Count the number of columns missing for each row
@@ -249,7 +247,7 @@ class DataDriver:
         features_json = jsonpickle.encode(features)
 
         # Save the serialized JSON to a file
-        self.save_json(json_to_write=features_json, suffix=FEATURES_SUFFIX)
+        self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
 
     def get_mode(self, feat_name):
         var_mode = ""
@@ -598,7 +596,7 @@ class DataDriver:
         interactions_json = jsonpickle.encode(interactions)
 
         # Save the serialized JSON to a file
-        self.save_json(json_to_write=interactions_json, suffix=INTERACTIONS_SUFFIX)
+        self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
 
     def save_json(self, json_to_write, suffix):
         file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, suffix), 'w')
@@ -606,24 +604,24 @@ class DataDriver:
         file.close()
 
     def load_summary_json(self):
-        return self.load_json(SUMMARY_SUFFIX)
+        return self.load_json(const_types.SUMMARY_SUFFIX)
 
     def load_features_json(self):
-        return self.load_json(FEATURES_SUFFIX)
+        return self.load_json(const_types.FEATURES_SUFFIX)
 
     def load_interactions_json(self):
-        return self.load_json(INTERACTIONS_SUFFIX)
+        return self.load_json(const_types.INTERACTIONS_SUFFIX)
 
     def load_json(self, json_suffix):
         absolute_filename = os.path.join(paths.EXAMPLES_FOLDER, self.title, json_suffix)
 
         # Check if the JSON file exists and if not, generate it
         if not os.path.isfile(absolute_filename):
-            if json_suffix == SUMMARY_SUFFIX:
+            if json_suffix == const_types.SUMMARY_SUFFIX:
                 self.generate_summary_json()
-            elif json_suffix == FEATURES_SUFFIX:
+            elif json_suffix == const_types.FEATURES_SUFFIX:
                 self.generate_features_json()
-            elif json_suffix == INTERACTIONS_SUFFIX:
+            elif json_suffix == const_types.INTERACTIONS_SUFFIX:
                 self.generate_interactions_json()
 
         # Read serialized JSON file
