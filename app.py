@@ -1,13 +1,15 @@
+import os
+
+import jsonpickle
+import pandas as pd
 from flask import Flask, flash, render_template, session, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
+
+from configuration import paths
+from configuration import key
 from data_driver import DataDriver
-from datasets import DataSets
 from dataset import DataSet
-import paths
-import key
-import os
-import pandas as pd
-import jsonpickle
+from datasets import DataSets
 
 app = Flask(__name__)
 

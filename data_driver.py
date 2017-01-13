@@ -7,14 +7,13 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import chi2_contingency
 
-import const_types
-import paths
-
+from configuration import paths
+from configuration import const_types
 from model.feature import Feature
 from model.features import Features
-from model.summary import Summary
 from model.interaction import Interaction
 from model.interactions import Interactions
+from model.summary import Summary
 
 
 class DataDriver:
