@@ -229,19 +229,15 @@ class DataDriver:
         self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
 
     def save_graph(self, plot, filename):
-        full_url = os.path.join(paths.EXAMPLES_FOLDER,
-                                self.title,
-                                str("graphs/" + filename))
+        full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + filename))
         fig = plot.get_figure()
         fig.savefig(full_url)
-        sns.plt.clf()  # Clear the figure to prepare for the next plot
+
+        # Clear the figure to prepare for the next plot
+        sns.plt.clf()
 
         # Return the relative URL to the histogram
-        graph_url = \
-            paths.EXAMPLES_RELATIVE + \
-            self.title + \
-            str(paths.GRAPHS_SUBFOLDER + filename)
-
+        graph_url = paths.EXAMPLES_RELATIVE + self.title + str(paths.GRAPHS_SUBFOLDER + filename)
         return graph_url
 
     def get_mode(self, feat_name):
@@ -252,6 +248,7 @@ class DataDriver:
             for m in mode:
                 var_mode = var_mode + str(m) + " "
 
+        # If no mode is found, return None instead of empty string
         if var_mode == "":
             var_mode = None
 
@@ -384,6 +381,9 @@ class DataDriver:
             n = freq_table.sum().sum()
             return np.sqrt(chi2 / (n * (min(freq_table.shape) - 1)))
 
+    def check_uniques_for_graphing(self, feat_name):
+        return self.get_percent_unique(feat_name) < 0.2 or self.get_count_unique(feat_name) < 12
+
     def generate_interactions_json(self):
         # Check if the data file exists, and if so, load the data as needed
         if self.data is None and os.path.isfile(self.filepath):
@@ -459,7 +459,7 @@ class DataDriver:
                         and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
                     # Don't plot if too many unique values
-                    if self.get_percent_unique(base_feat) < 0.2:
+                    if self.check_uniques_for_graphing(base_feat):
                         statsbycategory[compare_feat] = self.get_stats_by_category(base_feat, compare_feat)
 
                         # box plot
@@ -475,7 +475,7 @@ class DataDriver:
                 ) and feat_vartype == const_types.VARTYPE_CONTINUOUS:
 
                     # Don't plot if too many unique values
-                    if self.get_percent_unique(compare_feat) < 0.2:
+                    if self.check_uniques_for_graphing(compare_feat):
                         statsbycategoryflipped[compare_feat] = \
                             self.get_stats_by_category_flipped(base_feat, compare_feat)
 
@@ -493,7 +493,7 @@ class DataDriver:
                         compare_vartype == const_types.VARTYPE_CATEGORICAL or
                         compare_vartype == const_types.VARTYPE_BINARY):
 
-                    if self.get_percent_unique(compare_feat) < 0.2 and self.get_percent_unique(base_feat) < 0.2:
+                    if self.check_uniques_for_graphing(base_feat) and self.check_uniques_for_graphing(compare_feat):
 
                         # Bar chart (x = base, y = # occ, color = compare)
                         barchart = sns.countplot(x=base_feat, hue=compare_feat,
