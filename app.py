@@ -5,11 +5,11 @@ import pandas as pd
 from flask import Flask, flash, render_template, session, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
-from configuration import paths
 from configuration import key
+from configuration import paths
 from data_driver import DataDriver
-from dataset import DataSet
-from datasets import DataSets
+from model.datasets import DataSets
+from model.dataset import DataSet
 
 app = Flask(__name__)
 
