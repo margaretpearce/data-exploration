@@ -24,51 +24,61 @@ class DataDriver:
         self.id_column = selected_dataset[2]
         self.label_column = selected_dataset[3]
         self.data = None
+        self.error_code = None
 
     def load_data(self):
         # Load the data into a Pandas DataFrame
-        if str(self.file).endswith("csv"):
-            self.data = pd.read_csv(self.filepath)
-        elif str(self.file).endswith("tsv"):
-            self.data = pd.read_csv(self.filepath, sep='\t')
-        elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
-            self.data = pd.read_excel(self.filepath)
-        elif str(self.file).endswith("json"):
-            self.data = pd.read_json(self.filepath)
+        try:
+            if str(self.file).endswith("csv"):
+                self.data = pd.read_csv(self.filepath)
+            elif str(self.file).endswith("tsv"):
+                self.data = pd.read_csv(self.filepath, sep='\t')
+            elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
+                self.data = pd.read_excel(self.filepath)
+            elif str(self.file).endswith("json"):
+                self.data = pd.read_json(self.filepath)
+            return True
+
+        except ValueError:
+            self.error_code = "Error reading in the data set"
+            return False
 
     def generate_summary_json(self):
+        load_success = True
+
         # Check if the data file exists, and if so, load the data as needed
         if self.data is None and os.path.isfile(self.filepath):
-            self.load_data()
+            load_success = self.load_data()
 
-        # Get summary stats about the data and serialize it as JSON
-        num_records = self.data.shape[0]
-        num_features = self.data.shape[1]
-        index_column = self.id_column
-        label_column = self.label_column
+        if load_success:
+            # Get summary stats about the data and serialize it as JSON
+            num_records = self.data.shape[0]
+            num_features = self.data.shape[1]
+            index_column = self.id_column
+            label_column = self.label_column
 
-        # Count the number of columns missing for each row
-        num_rows_missing = self.count_missing(num_records)
+            # Count the number of columns missing for each row
+            num_rows_missing = self.count_missing(num_records)
 
-        # List of features
-        features_list = list(self.data.columns.values)
+            # List of features
+            features_list = list(self.data.columns.values)
 
-        # Sample data (five rows or less)
-        sample_list = self.get_sample(num_records, features_list)
+            # Sample data (five rows or less)
+            sample_list = self.get_sample(num_records, features_list)
 
-        summary = Summary(name=self.title,
-                          num_records=num_records,
-                          num_features=num_features,
-                          index_column=index_column,
-                          label_column=label_column,
-                          rows_missing=num_rows_missing,
-                          features_list=features_list,
-                          sample_list=sample_list
-                          )
-        summary_json = jsonpickle.encode(summary)
+            summary = Summary(name=self.title,
+                              num_records=num_records,
+                              num_features=num_features,
+                              index_column=index_column,
+                              label_column=label_column,
+                              rows_missing=num_rows_missing,
+                              features_list=features_list,
+                              sample_list=sample_list
+                              )
+            summary_json = jsonpickle.encode(summary)
 
-        # Save the serialized JSON to a file
-        self.save_json(json_to_write=summary_json, suffix=const_types.SUMMARY_SUFFIX)
+            # Save the serialized JSON to a file
+            self.save_json(json_to_write=summary_json, suffix=const_types.SUMMARY_SUFFIX)
 
     def count_missing(self, num_records):
         # Count the number of columns missing for each row
@@ -105,128 +115,132 @@ class DataDriver:
         return sample_list
 
     def generate_features_json(self):
+        load_success = True
+
         # Check if the data file exists, and if so, load the data as needed
         if self.data is None and os.path.isfile(self.filepath):
-            self.load_data()
+            load_success = self.load_data()
 
-        features_collection = []
-        feature_index = 0
+        if load_success:
 
-        # Univariate analysis for each feature
-        for var_name in self.data.columns.values:
+            features_collection = []
+            feature_index = 0
 
-            # Common for all field types
-            var_datatype = self.get_data_type(var_name)
-            var_vartype = self.get_variable_type(var_name)
-            var_count = int(self.data[var_name].count())
-            missing_count = int(self.data[var_name].isnull().sum())
-            missing_percent = missing_count / float(var_count)
-            var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
-            var_unique = int(len(self.data[var_name].unique()))
+            # Univariate analysis for each feature
+            for var_name in self.data.columns.values:
 
-            # Denote label and index, if applicable
-            if self.id_column is not None and var_name == self.id_column:
-                var_vartype += " (ID)"
-            elif self.label_column is not None and var_name == self.label_column:
-                var_vartype += " (Label)"
+                # Common for all field types
+                var_datatype = self.get_data_type(var_name)
+                var_vartype = self.get_variable_type(var_name)
+                var_count = int(self.data[var_name].count())
+                missing_count = int(self.data[var_name].isnull().sum())
+                missing_percent = missing_count / float(var_count)
+                var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
+                var_unique = int(len(self.data[var_name].unique()))
 
-            # Numeric only
-            var_avg = None
-            var_median = None
-            var_mode = None
-            var_max = None
-            var_min = None
-            var_stddev = None
-            var_variance = None
-            var_quantile25 = None
-            var_quantile75 = None
-            var_iqr = None
-            var_skew = None
-            var_kurtosis = None
+                # Denote label and index, if applicable
+                if self.id_column is not None and var_name == self.id_column:
+                    var_vartype += " (ID)"
+                elif self.label_column is not None and var_name == self.label_column:
+                    var_vartype += " (Label)"
 
-            # Non-numeric only
-            var_mostcommon = None
-            var_leastcommon = None
+                # Numeric only
+                var_avg = None
+                var_median = None
+                var_mode = None
+                var_max = None
+                var_min = None
+                var_stddev = None
+                var_variance = None
+                var_quantile25 = None
+                var_quantile75 = None
+                var_iqr = None
+                var_skew = None
+                var_kurtosis = None
 
-            # Graphs
-            graph_histogram = None
-            graph_countplot = None
+                # Non-numeric only
+                var_mostcommon = None
+                var_leastcommon = None
 
-            # Compute numeric statistics
-            if self.data[var_name].dtype in ['int64', 'float64']:
-                var_avg = str("%.3f" % float(self.data[var_name].mean()))
-                var_median = float(self.data[var_name].median())
-                var_max = float(self.data[var_name].max())
-                var_min = float(self.data[var_name].min())
-                var_stddev = str("%.3f" % self.data[var_name].std())
-                var_variance = str("%.3f" % self.data[var_name].var())
-                var_quantile25 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.25))
-                var_quantile75 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.75))
-                var_iqr = str("%.3f" % (self.data[var_name].dropna().quantile(q=0.75) -
-                                        self.data[var_name].dropna().quantile(q=0.25)))
-                var_skew = str("%.3f" % self.data[var_name].skew())
-                var_kurtosis = str("%.3f" % self.data[var_name].kurt())
+                # Graphs
+                graph_histogram = None
+                graph_countplot = None
 
-                var_mode = self.get_mode(var_name)
+                # Compute numeric statistics
+                if self.data[var_name].dtype in ['int64', 'float64']:
+                    var_avg = str("%.3f" % float(self.data[var_name].mean()))
+                    var_median = float(self.data[var_name].median())
+                    var_max = float(self.data[var_name].max())
+                    var_min = float(self.data[var_name].min())
+                    var_stddev = str("%.3f" % self.data[var_name].std())
+                    var_variance = str("%.3f" % self.data[var_name].var())
+                    var_quantile25 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.25))
+                    var_quantile75 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.75))
+                    var_iqr = str("%.3f" % (self.data[var_name].dropna().quantile(q=0.75) -
+                                            self.data[var_name].dropna().quantile(q=0.25)))
+                    var_skew = str("%.3f" % self.data[var_name].skew())
+                    var_kurtosis = str("%.3f" % self.data[var_name].kurt())
 
-            # Compute non-numeric stats
-            else:
-                var_mostcommon = str("%s (%d)" %
-                                     (self.data[var_name].value_counts().idxmax(),
-                                      self.data[var_name].value_counts().max()))
-                var_leastcommon = str("%s (%d)" %
-                                      (self.data[var_name].value_counts().idxmin(),
-                                       self.data[var_name].value_counts().min()))
+                    var_mode = self.get_mode(var_name)
 
-            # Histogram (numeric)
-            if self.data[var_name].dtype in ['int64', 'float64']:
-                hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
-                graph_histogram = self.save_graph(hist_plot, var_name + paths.FILE_HISTOGRAM)
+                # Compute non-numeric stats
+                else:
+                    var_mostcommon = str("%s (%d)" %
+                                         (self.data[var_name].value_counts().idxmax(),
+                                          self.data[var_name].value_counts().max()))
+                    var_leastcommon = str("%s (%d)" %
+                                          (self.data[var_name].value_counts().idxmin(),
+                                           self.data[var_name].value_counts().min()))
 
-            # Countplot (non-numeric)
-            else:
-                countplot = sns.countplot(y=self.data[var_name].dropna())
+                # Histogram (numeric)
+                if self.data[var_name].dtype in ['int64', 'float64']:
+                    hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
+                    graph_histogram = self.save_graph(hist_plot, var_name + paths.FILE_HISTOGRAM)
 
-                if (var_unique / float(var_count)) > 0.5:
-                    countplot.set(ylabel='')
-                    countplot.set(yticklabels=[])
-                    countplot.yaxis.set_visible(False)
+                # Countplot (non-numeric)
+                else:
+                    countplot = sns.countplot(y=self.data[var_name].dropna())
 
-                graph_countplot = self.save_graph(countplot, filename=var_name + paths.FILE_COUNTPLOT)
+                    if (var_unique / float(var_count)) > 0.5:
+                        countplot.set(ylabel='')
+                        countplot.set(yticklabels=[])
+                        countplot.yaxis.set_visible(False)
 
-            # Save the feature stats
-            feature = Feature(feat_name=var_name,
-                              feat_index=feature_index,
-                              feat_datatype=var_datatype,
-                              feat_vartype=var_vartype,
-                              feat_count=var_count,
-                              feat_missing=var_missing,
-                              feat_unique=var_unique,
-                              feat_average=var_avg,
-                              feat_median=var_median,
-                              feat_mode=var_mode,
-                              feat_max=var_max,
-                              feat_min=var_min,
-                              feat_stddev=var_stddev,
-                              feat_variance=var_variance,
-                              feat_quantile25=var_quantile25,
-                              feat_quantile75=var_quantile75,
-                              feat_iqr=var_iqr,
-                              feat_skew=var_skew,
-                              feat_kurtosis=var_kurtosis,
-                              feat_mostcommon=var_mostcommon,
-                              feat_leastcommon=var_leastcommon,
-                              graph_histogram=graph_histogram,
-                              graph_countplot=graph_countplot)
-            features_collection.append(feature)
-            feature_index += 1
+                    graph_countplot = self.save_graph(countplot, filename=var_name + paths.FILE_COUNTPLOT)
 
-        # Create object holding features collection and save as JSON
-        features = Features(self.title, features_collection)
-        features_json = jsonpickle.encode(features)
+                # Save the feature stats
+                feature = Feature(feat_name=var_name,
+                                  feat_index=feature_index,
+                                  feat_datatype=var_datatype,
+                                  feat_vartype=var_vartype,
+                                  feat_count=var_count,
+                                  feat_missing=var_missing,
+                                  feat_unique=var_unique,
+                                  feat_average=var_avg,
+                                  feat_median=var_median,
+                                  feat_mode=var_mode,
+                                  feat_max=var_max,
+                                  feat_min=var_min,
+                                  feat_stddev=var_stddev,
+                                  feat_variance=var_variance,
+                                  feat_quantile25=var_quantile25,
+                                  feat_quantile75=var_quantile75,
+                                  feat_iqr=var_iqr,
+                                  feat_skew=var_skew,
+                                  feat_kurtosis=var_kurtosis,
+                                  feat_mostcommon=var_mostcommon,
+                                  feat_leastcommon=var_leastcommon,
+                                  graph_histogram=graph_histogram,
+                                  graph_countplot=graph_countplot)
+                features_collection.append(feature)
+                feature_index += 1
 
-        # Save the serialized JSON to a file
-        self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
+            # Create object holding features collection and save as JSON
+            features = Features(self.title, features_collection)
+            features_json = jsonpickle.encode(features)
+
+            # Save the serialized JSON to a file
+            self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
 
     def save_graph(self, plot, filename):
         full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + filename))
@@ -385,181 +399,187 @@ class DataDriver:
         return self.get_percent_unique(feat_name) < 0.2 or self.get_count_unique(feat_name) < 12
 
     def generate_interactions_json(self):
+        load_success = True
+
         # Check if the data file exists, and if so, load the data as needed
         if self.data is None and os.path.isfile(self.filepath):
-            self.load_data()
+            load_success = self.load_data()
 
-        interactions_collection = {}
-        features = []
+        if load_success:
+            interactions_collection = {}
+            features = []
 
-        feature_index = 0
-        feature_names = list(self.data.columns.values)
+            feature_index = 0
+            feature_names = list(self.data.columns.values)
 
-        # Don't run any comparisons against the ID column
-        if self.id_column in feature_names:
-            feature_names.remove(self.id_column)
+            # Don't run any comparisons against the ID column
+            if self.id_column in feature_names:
+                feature_names.remove(self.id_column)
 
-        statsforcategory = self.get_stats_by_category_list()
+            statsforcategory = self.get_stats_by_category_list()
 
-        # For each feature, get as much relevant info as possible
-        for base_feat in feature_names:
+            # For each feature, get as much relevant info as possible
+            for base_feat in feature_names:
 
-            # Save the current feature to the collection
-            feat_datatype = self.get_data_type(base_feat)
-            feat_vartype = self.get_variable_type(base_feat)
-            base_feature = Feature(feat_name=base_feat, feat_index=feature_index, feat_datatype=feat_datatype,
-                                   feat_vartype=feat_vartype)
-            features.append(base_feature)
+                # Save the current feature to the collection
+                feat_datatype = self.get_data_type(base_feat)
+                feat_vartype = self.get_variable_type(base_feat)
+                base_feature = Feature(feat_name=base_feat, feat_index=feature_index, feat_datatype=feat_datatype,
+                                       feat_vartype=feat_vartype)
+                features.append(base_feature)
 
-            # Get a list of all other features
-            other_features = feature_names.copy()
-            other_features.remove(base_feat)
+                # Get a list of all other features
+                other_features = feature_names.copy()
+                other_features.remove(base_feat)
 
-            # Create empty dictionaries to store comparisons of this field against all others
-            scatterplots = {}
-            correlations = {}
-            covariances = {}
-            boxplots = {}
-            statsbycategory = {}
-            statsbycategoryflipped = {}
-            ztests = {}
-            ttests = {}
-            anova = {}
-            stackedbarplots = {}
-            chisquared = {}
-            cramers = {}
-            mantelhchi = {}
-            frequencytable = {}
-            frequencytable_firstrow = {}
+                # Create empty dictionaries to store comparisons of this field against all others
+                scatterplots = {}
+                correlations = {}
+                covariances = {}
+                boxplots = {}
+                statsbycategory = {}
+                statsbycategoryflipped = {}
+                ztests = {}
+                ttests = {}
+                anova = {}
+                stackedbarplots = {}
+                chisquared = {}
+                cramers = {}
+                mantelhchi = {}
+                frequencytable = {}
+                frequencytable_firstrow = {}
 
-            # Compare against all other features
-            for compare_feat in other_features:
+                # Compare against all other features
+                for compare_feat in other_features:
 
-                # Get the variable type and data type of both features
-                compare_vartype = self.get_variable_type(compare_feat)
+                    # Get the variable type and data type of both features
+                    compare_vartype = self.get_variable_type(compare_feat)
 
-                # Case #1 - Base: continous, compare: continuous
-                if feat_vartype == const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
+                    # Case #1 - Base: continuous, compare: continuous
+                    if feat_vartype == const_types.VARTYPE_CONTINUOUS and \
+                                    compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
-                    # Correlation
-                    correlations[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
-                                                     .corr()[compare_feat][base_feat]))
+                        # Correlation
+                        correlations[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
+                                                                        .corr()[compare_feat][base_feat]))
 
-                    # Covariance
-                    covariances[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
-                                                    .cov()[compare_feat][base_feat]))
+                        # Covariance
+                        covariances[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
+                                                                       .cov()[compare_feat][base_feat]))
 
-                    # Scatter plot
-                    scatterplot = sns.regplot(x=base_feat, y=compare_feat, data=self.data[[compare_feat, base_feat]])
-                    scatterplots[compare_feat] = \
-                        self.save_graph(scatterplot, filename=base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT)
+                        # Scatter plot
+                        scatterplot = sns.regplot(x=base_feat, y=compare_feat,
+                                                  data=self.data[[compare_feat, base_feat]])
+                        scatterplots[compare_feat] = self.save_graph(scatterplot,
+                                                                     filename=base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT)
 
-                # Case #2 - Base: categorical/ binary, compare: continuous
-                elif (feat_vartype == const_types.VARTYPE_CATEGORICAL or feat_vartype == const_types.VARTYPE_BINARY) \
-                        and compare_vartype == const_types.VARTYPE_CONTINUOUS:
+                    # Case #2 - Base: categorical/ binary, compare: continuous
+                    elif (feat_vartype == const_types.VARTYPE_CATEGORICAL
+                          or feat_vartype == const_types.VARTYPE_BINARY) \
+                            and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
-                    # Don't plot if too many unique values
-                    if self.check_uniques_for_graphing(base_feat):
-                        statsbycategory[compare_feat] = self.get_stats_by_category(base_feat, compare_feat)
+                        # Don't plot if too many unique values
+                        if self.check_uniques_for_graphing(base_feat):
+                            statsbycategory[compare_feat] = self.get_stats_by_category(base_feat, compare_feat)
 
-                        # box plot
-                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y",
-                                              data=self.data[[compare_feat, base_feat]])
-                        boxplots[compare_feat] = \
-                            self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
+                            # box plot
+                            boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y",
+                                                  data=self.data[[compare_feat, base_feat]])
+                            boxplots[compare_feat] = \
+                                self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
-                # Case #3 - Base: continuous, compare: categorical/ binary
-                elif (
-                        compare_vartype == const_types.VARTYPE_CATEGORICAL or
-                        compare_vartype == const_types.VARTYPE_BINARY
-                ) and feat_vartype == const_types.VARTYPE_CONTINUOUS:
+                    # Case #3 - Base: continuous, compare: categorical/ binary
+                    elif (
+                                    compare_vartype == const_types.VARTYPE_CATEGORICAL or
+                                    compare_vartype == const_types.VARTYPE_BINARY
+                    ) and feat_vartype == const_types.VARTYPE_CONTINUOUS:
 
-                    # Don't plot if too many unique values
-                    if self.check_uniques_for_graphing(compare_feat):
-                        statsbycategoryflipped[compare_feat] = \
-                            self.get_stats_by_category_flipped(base_feat, compare_feat)
+                        # Don't plot if too many unique values
+                        if self.check_uniques_for_graphing(compare_feat):
+                            statsbycategoryflipped[compare_feat] = \
+                                self.get_stats_by_category_flipped(base_feat, compare_feat)
 
-                        # Box plot
-                        boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",
-                                              data=self.data[[compare_feat, base_feat]])
-                        boxplots[compare_feat] = \
-                            self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
+                            # Box plot
+                            boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",
+                                                  data=self.data[[compare_feat, base_feat]])
+                            boxplots[compare_feat] = \
+                                self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
-                # Case #4 - Base: categorical/binary, compare: categorical/binary
-                elif (
-                        feat_vartype == const_types.VARTYPE_CATEGORICAL or
-                        feat_vartype == const_types.VARTYPE_BINARY
-                ) and (
-                        compare_vartype == const_types.VARTYPE_CATEGORICAL or
-                        compare_vartype == const_types.VARTYPE_BINARY):
+                    # Case #4 - Base: categorical/binary, compare: categorical/binary
+                    elif (
+                                    feat_vartype == const_types.VARTYPE_CATEGORICAL or
+                                    feat_vartype == const_types.VARTYPE_BINARY
+                    ) and (
+                                    compare_vartype == const_types.VARTYPE_CATEGORICAL or
+                                    compare_vartype == const_types.VARTYPE_BINARY):
 
-                    if self.check_uniques_for_graphing(base_feat) and self.check_uniques_for_graphing(compare_feat):
+                        if self.check_uniques_for_graphing(base_feat) and self.check_uniques_for_graphing(compare_feat):
 
-                        # Bar chart (x = base, y = # occ, color = compare)
-                        barchart = sns.countplot(x=base_feat, hue=compare_feat,
-                                                 data=self.data[[base_feat, compare_feat]].dropna())
-                        stackedbarplots[compare_feat] = \
-                            self.save_graph(barchart, filename=base_feat + "_" + compare_feat + paths.FILE_BARCHART)
+                            # Bar chart (x = base, y = # occ, color = compare)
+                            barchart = sns.countplot(x=base_feat, hue=compare_feat,
+                                                     data=self.data[[base_feat, compare_feat]].dropna())
+                            stackedbarplots[compare_feat] = \
+                                self.save_graph(barchart, filename=base_feat + "_" + compare_feat + paths.FILE_BARCHART)
 
-                        # Chi-Squared
-                        chi_results = self.get_chisquared(base_feat, compare_feat)
-                        if chi_results is not None:
-                            (chi2, p, dof, ex) = chi_results
-                            if p <= 0.001:
-                                p_sig = "p ≤ 0.001***"
-                            elif p <= 0.01:
-                                p_sig = "p ≤ 0.01**"
-                            elif p <= 0.05:
-                                p_sig = "p ≤ 0.05*"
-                            else:
-                                p_sig = "ns"
-                            chisquared[compare_feat] = str("%.3f, %s (p=%.7f)" % (chi2, p_sig, p))
+                            # Chi-Squared
+                            chi_results = self.get_chisquared(base_feat, compare_feat)
+                            if chi_results is not None:
+                                (chi2, p, dof, ex) = chi_results
+                                if p <= 0.001:
+                                    p_sig = "p ≤ 0.001***"
+                                elif p <= 0.01:
+                                    p_sig = "p ≤ 0.01**"
+                                elif p <= 0.05:
+                                    p_sig = "p ≤ 0.05*"
+                                else:
+                                    p_sig = "ns"
+                                chisquared[compare_feat] = str("%.3f, %s (p=%.7f)" % (chi2, p_sig, p))
 
-                        # Cramer's V
-                        cramersvstat = self.get_cramersv(base_feat, compare_feat)
-                        if cramersvstat is not None:
-                            cramers[compare_feat] = str("%.3f" % cramersvstat)
+                            # Cramer's V
+                            cramersvstat = self.get_cramersv(base_feat, compare_feat)
+                            if cramersvstat is not None:
+                                cramers[compare_feat] = str("%.3f" % cramersvstat)
 
-                    # Display frequency table, limit number of results
-                    if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
-                        # Frequency table
-                        frequency_dictionary, first_row_key = self.get_freq_dictionary(base_feat, compare_feat)
-                        frequencytable[compare_feat] = frequency_dictionary
-                        frequencytable_firstrow[compare_feat] = first_row_key
+                        # Display frequency table, limit number of results
+                        if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
+                            # Frequency table
+                            frequency_dictionary, first_row_key = self.get_freq_dictionary(base_feat, compare_feat)
+                            frequencytable[compare_feat] = frequency_dictionary
+                            frequencytable_firstrow[compare_feat] = first_row_key
 
-            # Create interaction object comparing this feature to all others
-            interaction = Interaction(feat_name=base_feat,
-                                      feat_index=feature_index,
-                                      other_features=other_features,
-                                      scatterplots=scatterplots,
-                                      correlations=correlations,
-                                      covariances=covariances,
-                                      boxplots=boxplots,
-                                      statsbycategory=statsbycategory,
-                                      statsbycategoryflipped=statsbycategoryflipped,
-                                      statsforcategory=statsforcategory,
-                                      ztests=ztests,
-                                      ttests=ttests,
-                                      anova=anova,
-                                      stackedbarplots=stackedbarplots,
-                                      chisquared=chisquared,
-                                      cramers=cramers,
-                                      mantelhchi=mantelhchi,
-                                      frequency_table=frequencytable,
-                                      frequencytable_firstrow=frequencytable_firstrow)
+                # Create interaction object comparing this feature to all others
+                interaction = Interaction(feat_name=base_feat,
+                                          feat_index=feature_index,
+                                          other_features=other_features,
+                                          scatterplots=scatterplots,
+                                          correlations=correlations,
+                                          covariances=covariances,
+                                          boxplots=boxplots,
+                                          statsbycategory=statsbycategory,
+                                          statsbycategoryflipped=statsbycategoryflipped,
+                                          statsforcategory=statsforcategory,
+                                          ztests=ztests,
+                                          ttests=ttests,
+                                          anova=anova,
+                                          stackedbarplots=stackedbarplots,
+                                          chisquared=chisquared,
+                                          cramers=cramers,
+                                          mantelhchi=mantelhchi,
+                                          frequency_table=frequencytable,
+                                          frequencytable_firstrow=frequencytable_firstrow)
 
-            # Add to the collection of interactions
-            interactions_collection[base_feat] = interaction
-            feature_index += 1
+                # Add to the collection of interactions
+                interactions_collection[base_feat] = interaction
+                feature_index += 1
 
-        # Create interactions object to represent the entire collection
-        interactions = Interactions(name=self.title,
-                                    features=features,
-                                    feature_interactions=interactions_collection)
-        interactions_json = jsonpickle.encode(interactions)
+            # Create interactions object to represent the entire collection
+            interactions = Interactions(name=self.title,
+                                        features=features,
+                                        feature_interactions=interactions_collection)
+            interactions_json = jsonpickle.encode(interactions)
 
-        # Save the serialized JSON to a file
-        self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
+            # Save the serialized JSON to a file
+            self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
 
     def save_json(self, json_to_write, suffix):
         file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, suffix), 'w')
@@ -588,7 +608,8 @@ class DataDriver:
                 self.generate_interactions_json()
 
         # Read serialized JSON file
-        with open(absolute_filename, 'r') as serialized_file:
-            json_str = serialized_file.read()
-            deserialized_json = jsonpickle.decode(json_str)
-        return deserialized_json
+        if os.path.isfile(absolute_filename):
+            with open(absolute_filename, 'r') as serialized_file:
+                json_str = serialized_file.read()
+                deserialized_json = jsonpickle.decode(json_str)
+            return deserialized_json
