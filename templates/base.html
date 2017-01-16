@@ -108,56 +108,9 @@
 <script type="text/javascript" src="./static/js/jquery.fileupload.js"></script>
 <script type="text/javascript" src="./static/js/jquery.fileupload-process.js"></script>
 <script type="text/javascript" src="./static/js/jquery.fileupload-ui.js"></script>
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        // Show the default selected field
-        selected_feat_id = $('#feature_selector').find(":selected").val()
-        feat_id = "#feature-" + selected_feat_id;
-        graph_id = "#graph-" + selected_feat_id;
-        $(feat_id).removeClass('table-hidden');
-        $(graph_id).removeClass('table-hidden');
-
-        // Respond to changing the selected feature (univariate)
-        $('#feature_selector').on('change', function() {
-            // Hide all tables
-            $('.feature-tables').addClass('table-hidden');
-            $('.feature-graphs').addClass('table-hidden');
-
-            // Show the tables for the selected field
-            feat_id = "#feature-" + $(this).val();
-            graph_id = "#graph-" + $(this).val();
-            $(feat_id).removeClass('table-hidden');
-            $(graph_id).removeClass('table-hidden');
-        });
-
-        // Show the default selected interaction
-        selected_int_id = $('#interaction_selector').find(":selected").val()
-        interaction_id = "#interactions-" + selected_int_id;
-        interactiongraph_id = "#interactiongraphs-" + selected_int_id;
-        $(interaction_id).removeClass('table-hidden');
-        $(interactiongraph_id).removeClass('table-hidden');
-
-        // Respond to changing the selected feature (bivariate)
-        $('#interaction_selector').on('change', function() {
-            // Hide all tables
-            $('.interactions-tables').addClass('table-hidden');
-            $('.interactions-graphs').addClass('table-hidden');
-
-            // Show the tables for the selected field
-            feat_id = "#interactions-" + $(this).val();
-            graph_id = "#interactiongraphs-" + $(this).val();
-            $(feat_id).removeClass('table-hidden');
-            $(graph_id).removeClass('table-hidden');
-        });
-
-        // Show active tab
-        var url_parts = location.href.split('/');
-        var last_segment = url_parts[url_parts.length-1];
-        $('.navbar-nav a[href="' + last_segment + '"]').parents('li').addClass('active');
-    });
-
-</script>
+<script type="text/javascript" src="./static/js/jquery.validate.min.js"></script>
+<script type="text/javascript" src="./static/js/additional-methods.min.js"></script>
+<script type="text/javascript" src="./static/js/data_exploration_tool.js"></script>
 
 </body>
 </html>
