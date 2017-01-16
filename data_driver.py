@@ -41,8 +41,6 @@ class DataDriver:
                 self.data = pd.read_csv(self.filepath, sep='\t')
             elif str(self.file).endswith("xls") or str(self.file).endswith("xlsx"):
                 self.data = pd.read_excel(self.filepath)
-            elif str(self.file).endswith("json"):
-                self.data = pd.read_json(self.filepath)
             return True
 
         except ValueError as err:
@@ -84,7 +82,7 @@ class DataDriver:
             summary_json = jsonpickle.encode(summary)
 
             # Save the serialized JSON to a file
-            self.save_json(json_to_write=summary_json, suffix=const_types.SUMMARY_SUFFIX)
+            self.save_json(json_to_write=summary_json, suffix=paths.SUMMARY_SUFFIX)
 
     def count_missing(self, num_records):
         # Count the number of columns missing for each row
@@ -246,7 +244,7 @@ class DataDriver:
             features_json = jsonpickle.encode(features)
 
             # Save the serialized JSON to a file
-            self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
+            self.save_json(json_to_write=features_json, suffix=paths.FEATURES_SUFFIX)
 
     def save_graph(self, plot, filename):
         folder_path = paths.EXAMPLES_FOLDER
@@ -593,7 +591,7 @@ class DataDriver:
             interactions_json = jsonpickle.encode(interactions)
 
             # Save the serialized JSON to a file
-            self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
+            self.save_json(json_to_write=interactions_json, suffix=paths.INTERACTIONS_SUFFIX)
 
     def get_error_msg(self):
         return self.error_code
@@ -609,13 +607,13 @@ class DataDriver:
         file.close()
 
     def load_summary_json(self):
-        return self.load_json(const_types.SUMMARY_SUFFIX)
+        return self.load_json(paths.SUMMARY_SUFFIX)
 
     def load_features_json(self):
-        return self.load_json(const_types.FEATURES_SUFFIX)
+        return self.load_json(paths.FEATURES_SUFFIX)
 
     def load_interactions_json(self):
-        return self.load_json(const_types.INTERACTIONS_SUFFIX)
+        return self.load_json(paths.INTERACTIONS_SUFFIX)
 
     def load_json(self, json_suffix):
         folder_path = paths.EXAMPLES_FOLDER
@@ -627,11 +625,11 @@ class DataDriver:
 
         # Check if the JSON file exists and if not, generate it
         if not os.path.isfile(absolute_filename):
-            if json_suffix == const_types.SUMMARY_SUFFIX:
+            if json_suffix == paths.SUMMARY_SUFFIX:
                 self.generate_summary_json()
-            elif json_suffix == const_types.FEATURES_SUFFIX:
+            elif json_suffix == paths.FEATURES_SUFFIX:
                 self.generate_features_json()
-            elif json_suffix == const_types.INTERACTIONS_SUFFIX:
+            elif json_suffix == paths.INTERACTIONS_SUFFIX:
                 self.generate_interactions_json()
 
         # Read serialized JSON file

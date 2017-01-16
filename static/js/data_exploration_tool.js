@@ -55,7 +55,7 @@ $(document).ready(function() {
           title: "required",
           file: {
             required: true,
-            extension: "csv|tsv|json|xls|xlsx",
+            extension: "csv|tsv|xls|xlsx",
             filesize: 16777216,
           }
         },
@@ -64,7 +64,7 @@ $(document).ready(function() {
           title: "Please enter the title of the data set",
           file: {
             required: "Please select the data set file",
-            extension: "Accepted file types are csv, tsv, json, xlsx, xls",
+            extension: "Accepted file types are csv, tsv, xlsx, xls",
             filesize: "Files must be under 2MB"
           },
         },

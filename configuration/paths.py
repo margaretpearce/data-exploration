@@ -15,3 +15,8 @@ FILE_BOXCHART = "_box.png"
 FILE_SCATTERPLOT = "_scatter.png"
 FILE_COUNTPLOT = "_countplot.png"
 FILE_HISTOGRAM = "_hist.png"
+
+# File endings
+SUMMARY_SUFFIX = "summary.json"
+FEATURES_SUFFIX = "features.json"
+INTERACTIONS_SUFFIX = "interactions.json"

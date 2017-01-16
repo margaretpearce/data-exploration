@@ -7,6 +7,7 @@ from werkzeug.utils import secure_filename
 
 from configuration import key
 from configuration import paths
+from configuration import const_types
 from data_driver import DataDriver
 from model.datasets import DataSets
 from model.dataset import DataSet
@@ -17,7 +18,6 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = paths.UPLOAD_FOLDER
 app.config['EXAMPLES_FOLDER'] = paths.EXAMPLES_FOLDER
 app.secret_key = key.SECRET_KEY
-ALLOWED_EXTENSIONS = ['csv', 'json', 'xls', 'xlsx', 'tsv']
 
 
 @app.before_first_request
@@ -118,7 +118,7 @@ def dataset_selection_changed():
 
 def allowed_file(filename):
     return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in const_types.ALLOWED_EXTENSIONS
 
 
 @app.route('/upload', methods=['GET', 'POST'])
