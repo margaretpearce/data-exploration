@@ -3,7 +3,15 @@
 
 <h3>Bi-variate Analysis</h3>
 
+{% if error_msg %}
+<div>
+    <p>There was an error handling the data set:</p>
+    <p>{{ error_msg }}</p>
+</div>
+{% endif %}
+
 <!-- Pick a variable, select the label field by default -->
+{% if data.features %}
 <div class="container dataset-menu">
         <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
             <select id="interaction_selector" class="custom-dropdown__select custom-dropdown__select--white">
@@ -17,6 +25,7 @@
             </select>
         </span>
 </div>
+{% endif %}
 
 <!-- Table with bivariate stats for selected variable against all others -->
 {% if data.feature_interactions %}

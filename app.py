@@ -224,12 +224,14 @@ def index():
 
     # Get the JSON for the summary data
     summary_json = driver.load_summary_json()
+    error_msg = driver.get_error_msg()
 
     return render_template('index.html',
                            data=summary_json,
                            data_file=selected_dataset[0],
                            dataset_options=dataset_options,
-                           uploaded_dataset=uploaded_dataset)
+                           uploaded_dataset=uploaded_dataset,
+                           error_msg=error_msg)
 
 
 @app.route('/univariate')
@@ -242,12 +244,14 @@ def univariate():
 
     # Get the JSON for the summary data
     features_json = driver.load_features_json()
+    error_msg = driver.get_error_msg()
 
     return render_template('univariate.html',
                            mydata=features_json,
                            data_file=selected_dataset[0],
                            dataset_options=dataset_options,
-                           uploaded_dataset=uploaded_dataset)
+                           uploaded_dataset=uploaded_dataset,
+                           error_msg=error_msg)
 
 
 @app.route('/bivariate')
@@ -260,9 +264,11 @@ def bivariate():
 
     # Get the JSON for the summary data
     interactions_json = driver.load_interactions_json()
+    error_msg = driver.get_error_msg()
 
     return render_template('bivariate.html',
                            data=interactions_json,
                            data_file=selected_dataset[0],
                            dataset_options=dataset_options,
-                           uploaded_dataset=uploaded_dataset)
+                           uploaded_dataset=uploaded_dataset,
+                           error_msg=error_msg)

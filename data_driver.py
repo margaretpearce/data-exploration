@@ -45,8 +45,8 @@ class DataDriver:
                 self.data = pd.read_json(self.filepath)
             return True
 
-        except ValueError:
-            self.error_code = "Error reading in the data set"
+        except ValueError as err:
+            self.error_code = str("{0}".format(err))
             return False
 
     def generate_summary_json(self):
@@ -469,8 +469,8 @@ class DataDriver:
                     compare_vartype = self.get_variable_type(compare_feat)
 
                     # Case #1 - Base: continuous, compare: continuous
-                    if feat_vartype == const_types.VARTYPE_CONTINUOUS and \
-                                    compare_vartype == const_types.VARTYPE_CONTINUOUS:
+                    if feat_vartype == \
+                            const_types.VARTYPE_CONTINUOUS and compare_vartype == const_types.VARTYPE_CONTINUOUS:
 
                         # Correlation
                         correlations[compare_feat] = str("%.3f" % float(self.data[[compare_feat, base_feat]]
@@ -483,8 +483,9 @@ class DataDriver:
                         # Scatter plot
                         scatterplot = sns.regplot(x=base_feat, y=compare_feat,
                                                   data=self.data[[compare_feat, base_feat]])
-                        scatterplots[compare_feat] = self.save_graph(scatterplot,
-                                                                     filename=base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT)
+                        scatterplots[compare_feat] = \
+                            self.save_graph(scatterplot,
+                                            filename=base_feat + "_" + compare_feat + paths.FILE_SCATTERPLOT)
 
                     # Case #2 - Base: categorical/ binary, compare: continuous
                     elif (feat_vartype == const_types.VARTYPE_CATEGORICAL
@@ -593,6 +594,9 @@ class DataDriver:
 
             # Save the serialized JSON to a file
             self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
+
+    def get_error_msg(self):
+        return self.error_code
 
     def save_json(self, json_to_write, suffix):
         folder_path = paths.EXAMPLES_FOLDER

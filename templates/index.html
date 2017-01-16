@@ -4,9 +4,19 @@
 <!--Data set title-->
 {% if data.name %}
 <h3>Data summary: {{ data.name }}</h3>
+{% elif data_file %}
+<h3>{{ data_file }}</h3>
+{% endif %}
+
+{% if error_msg %}
+<div>
+    <p>There was an error handling the data set:</p>
+    <p>{{ error_msg }}</p>
+</div>
 {% endif %}
 
 <!-- Summary stats about the data set -->
+{% if data.num_records or data.num_features or data.index_column or data.label_column %}
 <div class="table-responsive">
     <table class="table table-striped">
         <tbody>
@@ -37,6 +47,7 @@
         </tbody>
     </table>
 </div>
+{% endif %}
 
 {% if data.rows_missing %}
 <h3>Missing data</h3>

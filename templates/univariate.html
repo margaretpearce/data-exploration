@@ -4,8 +4,15 @@
 <!--Data set title-->
 <h3>Univariate Analysis</h3>
 
-<!-- Toggle between variables -->
+{% if error_msg %}
+<div>
+    <p>There was an error handling the data set:</p>
+    <p>{{ error_msg }}</p>
+</div>
+{% endif %}
 
+<!-- Toggle between variables -->
+{% if mydata.features %}
 <div class="container dataset-menu">
         <span class="custom-dropdown custom-dropdown--white custom-dropdown--border">
             <select id="feature_selector" class="custom-dropdown__select custom-dropdown__select--white">
@@ -19,6 +26,7 @@
             </select>
         </span>
 </div>
+{% endif %}
 
 <!-- Table with stats -->
 {% for f in mydata.features %}
