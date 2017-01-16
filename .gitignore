@@ -16,4 +16,5 @@ __pycache__/
 __pycache__/*
 .idea/
 .idea/*
-./static/graphics/*.psd
+static/graphics/*.psd
+static/graphics/plusicon.psd
