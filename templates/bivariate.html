@@ -19,6 +19,7 @@
 </div>
 
 <!-- Table with bivariate stats for selected variable against all others -->
+{% if data.feature_interactions %}
 {% for f in data.feature_interactions.keys() %}
 <div id="interactions-{{ data.feature_interactions[f].feat_index }}" class="interactions-tables table-hidden">
     {% for i in data.feature_interactions[f].other_features %}
@@ -202,4 +203,5 @@
     {% endfor %}
 </div>
 {% endfor %}
+{% endif %}
 {% endblock %}

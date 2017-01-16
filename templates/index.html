@@ -38,7 +38,7 @@
     </table>
 </div>
 
-{% if data.rows_missing is not none %}
+{% if data.rows_missing %}
 <h3>Missing data</h3>
 <div class="table-responsive">
     <table class="table table-striped">
@@ -58,7 +58,7 @@
 </div>
 {% endif %}
 
-{% if data.sample_list is not none %}
+{% if data.sample_list %}
 <h3>Sample rows</h3>
 <div class="table-responsive">
     <table class="table table-striped">
