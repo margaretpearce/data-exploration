@@ -20,9 +20,15 @@ class DataDriver:
     def __init__(self, selected_dataset):
         self.file = selected_dataset[0]
         self.title = selected_dataset[1]
-        self.filepath = os.path.join(paths.EXAMPLES_FOLDER, self.title, str(self.file))
         self.id_column = selected_dataset[2]
         self.label_column = selected_dataset[3]
+        self.file_uploaded = selected_dataset[4]
+
+        if self.file_uploaded:
+            self.filepath = os.path.join(paths.UPLOAD_FOLDER, self.title, str(self.file))
+        else:
+            self.filepath = os.path.join(paths.EXAMPLES_FOLDER, self.title, str(self.file))
+
         self.data = None
         self.error_code = None
 
@@ -243,7 +249,14 @@ class DataDriver:
             self.save_json(json_to_write=features_json, suffix=const_types.FEATURES_SUFFIX)
 
     def save_graph(self, plot, filename):
-        full_url = os.path.join(paths.EXAMPLES_FOLDER, self.title, str("graphs/" + filename))
+        folder_path = paths.EXAMPLES_FOLDER
+        relative_path = paths.EXAMPLES_RELATIVE
+
+        if self.file_uploaded:
+            folder_path = paths.UPLOAD_FOLDER
+            relative_path = paths.UPLOAD_RELATIVE
+
+        full_url = os.path.join(folder_path, self.title, str("graphs/" + filename))
         fig = plot.get_figure()
         fig.savefig(full_url)
 
@@ -251,7 +264,7 @@ class DataDriver:
         sns.plt.clf()
 
         # Return the relative URL to the histogram
-        graph_url = paths.EXAMPLES_RELATIVE + self.title + str(paths.GRAPHS_SUBFOLDER + filename)
+        graph_url = relative_path + self.title + str(paths.GRAPHS_SUBFOLDER + filename)
         return graph_url
 
     def get_mode(self, feat_name):
@@ -582,7 +595,12 @@ class DataDriver:
             self.save_json(json_to_write=interactions_json, suffix=const_types.INTERACTIONS_SUFFIX)
 
     def save_json(self, json_to_write, suffix):
-        file = open(os.path.join(paths.EXAMPLES_FOLDER, self.title, suffix), 'w')
+        folder_path = paths.EXAMPLES_FOLDER
+
+        if self.file_uploaded:
+            folder_path = paths.UPLOAD_FOLDER
+
+        file = open(os.path.join(folder_path, self.title, suffix), 'w')
         file.write(json_to_write)
         file.close()
 
@@ -596,7 +614,12 @@ class DataDriver:
         return self.load_json(const_types.INTERACTIONS_SUFFIX)
 
     def load_json(self, json_suffix):
-        absolute_filename = os.path.join(paths.EXAMPLES_FOLDER, self.title, json_suffix)
+        folder_path = paths.EXAMPLES_FOLDER
+
+        if self.file_uploaded:
+            folder_path = paths.UPLOAD_FOLDER
+
+        absolute_filename = os.path.join(folder_path, self.title, json_suffix)
 
         # Check if the JSON file exists and if not, generate it
         if not os.path.isfile(absolute_filename):

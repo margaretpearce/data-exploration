@@ -2,7 +2,7 @@ import os
 
 import jsonpickle
 import pandas as pd
-from flask import Flask, flash, render_template, session, request, redirect, url_for, send_from_directory
+from flask import Flask, flash, render_template, session, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
 from configuration import key
@@ -57,6 +57,7 @@ def selecteddataset():
     data_title = None
     data_id = None
     data_label = None
+    data_uploaded = False
 
     # Check if the values are already in session
     if "data_file" in session:
@@ -67,6 +68,8 @@ def selecteddataset():
         data_id = session["data_id"]
     if "data_label" in session:
         data_label = session["data_label"]
+    if "data_file_uploaded" in session and session["data_file_uploaded"] == data_file:
+        data_uploaded = True
 
     # Make sure that at least the file and title are populated, or else get it from the page
     if data_file is None or data_title is None:
@@ -75,6 +78,7 @@ def selecteddataset():
         data_title = "Iris"
         data_id = "ID"
         data_label = "Species"
+        data_uploaded = False
 
         # Save values in session for future requests
         session["data_file"] = data_file
@@ -82,7 +86,7 @@ def selecteddataset():
         session["data_id"] = data_id
         session["data_label"] = data_label
 
-    return [data_file, data_title, data_id, data_label]
+    return [data_file, data_title, data_id, data_label, data_uploaded]
 
 
 @app.route('/dataset_selection_changed', methods=['POST'])
@@ -136,7 +140,7 @@ def upload_file():
         # If the file was uploaded and is an allowed type, proceed with upload
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            filepath = os.path.join(paths.UPLOAD_FOLDER, filename)
             file.save(filepath)
 
             data_title = ""
@@ -163,15 +167,9 @@ def upload_file():
         return render_template('upload.html', dataset_options=dataset_options)
 
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
-
-
 def datasetuploaded(uploaded_file_path, data_title, data_id=None, data_label=None):
     # Create folder with graphs sub folder
-    data_path = os.path.join(paths.EXAMPLES_FOLDER, data_title)
+    data_path = os.path.join(paths.UPLOAD_FOLDER, data_title)
     if not os.path.exists(data_path):
         os.makedirs(data_path)
         os.makedirs(os.path.join(data_path, "graphs"))
@@ -209,7 +207,7 @@ def getuploadeddataset():
         data_label = session["data_label_uploaded"]
 
     if data_file is not None and data_title is not None:
-        return [data_file, data_title, data_id, data_label]
+        return [data_file, data_title, data_id, data_label, True]
 
     return None
 
