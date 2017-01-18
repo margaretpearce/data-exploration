@@ -138,7 +138,7 @@ class DataDriver:
                 var_vartype = self.get_variable_type(var_name)
                 var_count = int(self.data[var_name].count())
                 missing_count = int(self.data[var_name].isnull().sum())
-                missing_percent = missing_count / float(var_count)
+                missing_percent = 100 * missing_count / float(self.data.shape[0])
                 var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
                 var_unique = int(len(self.data[var_name].unique()))
 
@@ -197,12 +197,12 @@ class DataDriver:
                                            self.data[var_name].value_counts().min()))
 
                 # Histogram (numeric)
-                if self.data[var_name].dtype in ['int64', 'float64']:
+                if self.get_data_type(var_name) in [const_types.DATATYPE_FLOAT, const_types.DATATYPE_INTEGER]:
                     hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
                     graph_histogram = self.save_graph(hist_plot, var_name + paths.FILE_HISTOGRAM)
 
                 # Countplot (non-numeric)
-                else:
+                elif self.check_uniques_for_graphing(var_name):
                     countplot = sns.countplot(y=self.data[var_name].dropna())
 
                     if (var_unique / float(var_count)) > 0.5:
