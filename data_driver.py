@@ -1,4 +1,5 @@
 import os
+import re
 from collections import OrderedDict
 
 import jsonpickle
@@ -205,7 +206,7 @@ class DataDriver:
                 elif self.check_uniques_for_graphing(var_name):
                     countplot = sns.countplot(y=self.data[var_name].dropna())
 
-                    if (var_unique / float(var_count)) > 0.5:
+                    if self.get_percent_unique(var_name) > 0.5:
                         countplot.set(ylabel='')
                         countplot.set(yticklabels=[])
                         countplot.yaxis.set_visible(False)
@@ -253,6 +254,9 @@ class DataDriver:
         if self.file_uploaded:
             folder_path = paths.UPLOAD_FOLDER
             relative_path = paths.UPLOAD_RELATIVE
+
+        # Replace any special characters in the filename
+        filename = re.sub(r'[^.a-zA-Z0-9_-]', '', filename)
 
         full_url = os.path.join(folder_path, self.title, str("graphs/" + filename))
         fig = plot.get_figure()
