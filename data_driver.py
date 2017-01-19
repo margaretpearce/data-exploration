@@ -6,6 +6,7 @@ import jsonpickle
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
 from configuration import paths
@@ -205,12 +206,6 @@ class DataDriver:
                 # Countplot (non-numeric)
                 elif self.check_uniques_for_graphing(var_name):
                     countplot = sns.countplot(y=self.data[var_name].dropna())
-
-                    if self.get_percent_unique(var_name) > 0.5:
-                        countplot.set(ylabel='')
-                        countplot.set(yticklabels=[])
-                        countplot.yaxis.set_visible(False)
-
                     graph_countplot = self.save_graph(countplot, filename=var_name + paths.FILE_COUNTPLOT)
 
                 # Save the feature stats
@@ -501,6 +496,10 @@ class DataDriver:
                             # box plot
                             boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="y",
                                                   data=self.data[[compare_feat, base_feat]])
+
+                            if self.get_count_unique(base_feat) > 8:
+                                boxplot.set_xticklabels(labels=boxplot.get_xticklabels(), rotation=45)
+
                             boxplots[compare_feat] = \
                                 self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
@@ -518,6 +517,7 @@ class DataDriver:
                             # Box plot
                             boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h",
                                                   data=self.data[[compare_feat, base_feat]])
+
                             boxplots[compare_feat] = \
                                 self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
@@ -534,6 +534,10 @@ class DataDriver:
                             # Bar chart (x = base, y = # occ, color = compare)
                             barchart = sns.countplot(x=base_feat, hue=compare_feat,
                                                      data=self.data[[base_feat, compare_feat]].dropna())
+
+                            if self.get_count_unique(base_feat) > 8:
+                                barchart.set_xticklabels(labels=barchart.get_xticklabels(), rotation=45)
+
                             stackedbarplots[compare_feat] = \
                                 self.save_graph(barchart, filename=base_feat + "_" + compare_feat + paths.FILE_BARCHART)
 
@@ -557,7 +561,7 @@ class DataDriver:
                                 cramers[compare_feat] = str("%.3f" % cramersvstat)
 
                         # Display frequency table, limit number of results
-                        if self.get_count_unique(base_feat) <= 10 and self.get_count_unique(compare_feat) <= 50:
+                        if self.get_count_unique(base_feat) <= 30 and self.get_count_unique(compare_feat) <= 50:
                             # Frequency table
                             frequency_dictionary, first_row_key = self.get_freq_dictionary(base_feat, compare_feat)
                             frequencytable[compare_feat] = frequency_dictionary
