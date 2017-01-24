@@ -1,5 +1,4 @@
 import os
-
 import jsonpickle
 import pandas as pd
 from flask import Flask, flash, render_template, session, request, redirect, url_for
