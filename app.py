@@ -8,9 +8,9 @@ from werkzeug.utils import secure_filename
 from configuration import key
 from configuration import paths
 from configuration import const_types
-from data_driver import DataDriver
 from data_summary import DataSummary
 from data_univariate import DataUnivariate
+from data_bivariate import DataBivariate
 from model.datasets import DataSets
 from model.dataset import DataSet
 
@@ -262,7 +262,7 @@ def bivariate():
     dataset_options = getmenu()
     uploaded_dataset = getuploadeddataset()
 
-    driver = DataDriver(selected_dataset)
+    driver = DataBivariate(selected_dataset)
 
     # Get the JSON for the summary data
     interactions_json = driver.load_interactions_json()
