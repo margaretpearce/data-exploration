@@ -6,7 +6,6 @@ import jsonpickle
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency
 
 from configuration import paths
@@ -15,7 +14,6 @@ from model.feature import Feature
 from model.features import Features
 from model.interaction import Interaction
 from model.interactions import Interactions
-from model.summary import Summary
 
 
 class DataDriver:
@@ -49,199 +47,6 @@ class DataDriver:
             self.error_code = str("{0}".format(err))
             return False
 
-    def generate_summary_json(self):
-        load_success = True
-
-        # Check if the data file exists, and if so, load the data as needed
-        if self.data is None and os.path.isfile(self.filepath):
-            load_success = self.load_data()
-
-        if load_success:
-            # Get summary stats about the data and serialize it as JSON
-            num_records = self.data.shape[0]
-            num_features = self.data.shape[1]
-            index_column = self.id_column
-            label_column = self.label_column
-
-            # Count the number of columns missing for each row
-            num_rows_missing = self.count_missing(num_records)
-
-            # List of features
-            features_list = list(self.data.columns.values)
-
-            # Sample data (five rows or less)
-            sample_list = self.get_sample(num_records, features_list)
-
-            summary = Summary(name=self.title,
-                              num_records=num_records,
-                              num_features=num_features,
-                              index_column=index_column,
-                              label_column=label_column,
-                              rows_missing=num_rows_missing,
-                              features_list=features_list,
-                              sample_list=sample_list
-                              )
-            summary_json = jsonpickle.encode(summary)
-
-            # Save the serialized JSON to a file
-            self.save_json(json_to_write=summary_json, suffix=paths.SUMMARY_SUFFIX)
-
-    def count_missing(self, num_records):
-        # Count the number of columns missing for each row
-        count_missing = self.data.apply(lambda x: sum(x.isnull().values), axis=1)
-        self.data["num_missing"] = pd.Series(count_missing)
-
-        num_rows_missing = {}
-        cumulative_row_sum = 0
-
-        for i in range(0, num_records):
-            # Count the number of missing rows and add it to the list
-            num_rows_i_missing = int(sum(self.data["num_missing"] == i))
-            num_rows_missing[i] = num_rows_i_missing
-            cumulative_row_sum += num_rows_i_missing
-
-            # If we reached the point where we have accounted for all rows, stop looking for rows
-            if cumulative_row_sum == num_records:
-                break
-
-        # Sort the dictionary
-        num_rows_missing = OrderedDict(sorted(num_rows_missing.items()))
-
-        # Remove the added column
-        self.data.drop("num_missing", axis=1, inplace=True)
-
-        return num_rows_missing
-
-    def get_sample(self, num_records, features_list):
-        num_samples = 5
-        if num_records < num_samples:
-            num_samples = num_records
-
-        sample_list = self.data.sample(num_samples)[features_list].values.tolist()
-        return sample_list
-
-    def generate_features_json(self):
-        load_success = True
-
-        # Check if the data file exists, and if so, load the data as needed
-        if self.data is None and os.path.isfile(self.filepath):
-            load_success = self.load_data()
-
-        if load_success:
-
-            features_collection = []
-            feature_index = 0
-
-            # Univariate analysis for each feature
-            for var_name in self.data.columns.values:
-
-                # Common for all field types
-                var_datatype = self.get_data_type(var_name)
-                var_vartype = self.get_variable_type(var_name)
-                var_count = int(self.data[var_name].count())
-                missing_count = int(self.data[var_name].isnull().sum())
-                missing_percent = 100 * missing_count / float(self.data.shape[0])
-                var_missing = str("%s (%.3f%%)" % (missing_count, missing_percent))
-                var_unique = int(len(self.data[var_name].unique()))
-
-                # Denote label and index, if applicable
-                if self.id_column is not None and var_name == self.id_column:
-                    var_vartype += " (ID)"
-                elif self.label_column is not None and var_name == self.label_column:
-                    var_vartype += " (Label)"
-
-                # Numeric only
-                var_avg = None
-                var_median = None
-                var_mode = None
-                var_max = None
-                var_min = None
-                var_stddev = None
-                var_variance = None
-                var_quantile25 = None
-                var_quantile75 = None
-                var_iqr = None
-                var_skew = None
-                var_kurtosis = None
-
-                # Non-numeric only
-                var_mostcommon = None
-                var_leastcommon = None
-
-                # Graphs
-                graph_histogram = None
-                graph_countplot = None
-
-                # Compute numeric statistics
-                if self.data[var_name].dtype in ['int64', 'float64']:
-                    var_avg = str("%.3f" % float(self.data[var_name].mean()))
-                    var_median = float(self.data[var_name].median())
-                    var_max = float(self.data[var_name].max())
-                    var_min = float(self.data[var_name].min())
-                    var_stddev = str("%.3f" % self.data[var_name].std())
-                    var_variance = str("%.3f" % self.data[var_name].var())
-                    var_quantile25 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.25))
-                    var_quantile75 = str("%.3f" % self.data[var_name].dropna().quantile(q=0.75))
-                    var_iqr = str("%.3f" % (self.data[var_name].dropna().quantile(q=0.75) -
-                                            self.data[var_name].dropna().quantile(q=0.25)))
-                    var_skew = str("%.3f" % self.data[var_name].skew())
-                    var_kurtosis = str("%.3f" % self.data[var_name].kurt())
-
-                    var_mode = self.get_mode(var_name)
-
-                # Compute non-numeric stats
-                else:
-                    var_mostcommon = str("%s (%d)" %
-                                         (self.data[var_name].value_counts().idxmax(),
-                                          self.data[var_name].value_counts().max()))
-                    var_leastcommon = str("%s (%d)" %
-                                          (self.data[var_name].value_counts().idxmin(),
-                                           self.data[var_name].value_counts().min()))
-
-                # Histogram (numeric)
-                if self.get_data_type(var_name) in [const_types.DATATYPE_FLOAT, const_types.DATATYPE_INTEGER]:
-                    hist_plot = sns.distplot(self.data[var_name].dropna(), bins=None, hist=True, kde=False, rug=False)
-                    graph_histogram = self.save_graph(hist_plot, var_name + paths.FILE_HISTOGRAM)
-
-                # Countplot (non-numeric)
-                elif self.check_uniques_for_graphing(var_name):
-                    countplot = sns.countplot(y=self.data[var_name].dropna())
-                    graph_countplot = self.save_graph(countplot, filename=var_name + paths.FILE_COUNTPLOT)
-
-                # Save the feature stats
-                feature = Feature(feat_name=var_name,
-                                  feat_index=feature_index,
-                                  feat_datatype=var_datatype,
-                                  feat_vartype=var_vartype,
-                                  feat_count=var_count,
-                                  feat_missing=var_missing,
-                                  feat_unique=var_unique,
-                                  feat_average=var_avg,
-                                  feat_median=var_median,
-                                  feat_mode=var_mode,
-                                  feat_max=var_max,
-                                  feat_min=var_min,
-                                  feat_stddev=var_stddev,
-                                  feat_variance=var_variance,
-                                  feat_quantile25=var_quantile25,
-                                  feat_quantile75=var_quantile75,
-                                  feat_iqr=var_iqr,
-                                  feat_skew=var_skew,
-                                  feat_kurtosis=var_kurtosis,
-                                  feat_mostcommon=var_mostcommon,
-                                  feat_leastcommon=var_leastcommon,
-                                  graph_histogram=graph_histogram,
-                                  graph_countplot=graph_countplot)
-                features_collection.append(feature)
-                feature_index += 1
-
-            # Create object holding features collection and save as JSON
-            features = Features(self.title, features_collection)
-            features_json = jsonpickle.encode(features)
-
-            # Save the serialized JSON to a file
-            self.save_json(json_to_write=features_json, suffix=paths.FEATURES_SUFFIX)
-
     def save_graph(self, plot, filename):
         folder_path = paths.EXAMPLES_FOLDER
         relative_path = paths.EXAMPLES_RELATIVE
@@ -263,20 +68,6 @@ class DataDriver:
         # Return the relative URL to the histogram
         graph_url = relative_path + self.title + str(paths.GRAPHS_SUBFOLDER + filename)
         return graph_url
-
-    def get_mode(self, feat_name):
-        var_mode = ""
-        mode = self.data[feat_name].mode()
-
-        if mode is not None:
-            for m in mode:
-                var_mode = var_mode + str(m) + " "
-
-        # If no mode is found, return None instead of empty string
-        if var_mode == "":
-            var_mode = None
-
-        return var_mode
 
     def get_data_type(self, feat_name):
         raw_type = str(self.data[feat_name].dtype)
@@ -614,12 +405,6 @@ class DataDriver:
         file.write(json_to_write)
         file.close()
 
-    def load_summary_json(self):
-        return self.load_json(paths.SUMMARY_SUFFIX)
-
-    def load_features_json(self):
-        return self.load_json(paths.FEATURES_SUFFIX)
-
     def load_interactions_json(self):
         return self.load_json(paths.INTERACTIONS_SUFFIX)
 
@@ -634,9 +419,9 @@ class DataDriver:
         # Check if the JSON file exists and if not, generate it
         if not os.path.isfile(absolute_filename):
             if json_suffix == paths.SUMMARY_SUFFIX:
-                self.generate_summary_json()
+                return None
             elif json_suffix == paths.FEATURES_SUFFIX:
-                self.generate_features_json()
+                return None
             elif json_suffix == paths.INTERACTIONS_SUFFIX:
                 self.generate_interactions_json()
 

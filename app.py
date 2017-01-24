@@ -9,6 +9,8 @@ from configuration import key
 from configuration import paths
 from configuration import const_types
 from data_driver import DataDriver
+from data_summary import DataSummary
+from data_univariate import DataUnivariate
 from model.datasets import DataSets
 from model.dataset import DataSet
 
@@ -220,7 +222,7 @@ def index():
     dataset_options = getmenu()
     uploaded_dataset = getuploadeddataset()
 
-    driver = DataDriver(selected_dataset)
+    driver = DataSummary(selected_dataset)
 
     # Get the JSON for the summary data
     summary_json = driver.load_summary_json()
@@ -240,7 +242,7 @@ def univariate():
     dataset_options = getmenu()
     uploaded_dataset = getuploadeddataset()
 
-    driver = DataDriver(selected_dataset)
+    driver = DataUnivariate(selected_dataset)
 
     # Get the JSON for the summary data
     features_json = driver.load_features_json()
