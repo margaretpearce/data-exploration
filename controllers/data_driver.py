@@ -25,7 +25,6 @@ class DataDriver:
         self.error_code = None
 
     def load_data(self):
-        # Load the data into a Pandas DataFrame
         try:
             if str(self.file).endswith("csv"):
                 self.data = pd.read_csv(self.filepath)

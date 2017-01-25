@@ -1,17 +1,18 @@
 import os
+
 import jsonpickle
 import pandas as pd
 from flask import Flask, flash, render_template, session, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
+from configuration import const_types
 from configuration import key
 from configuration import paths
-from configuration import const_types
-from data_summary import DataSummary
-from data_univariate import DataUnivariate
-from data_bivariate import DataBivariate
-from model.datasets import DataSets
+from controllers.data_summary import DataSummary
+from controllers.data_univariate import DataUnivariate
+from controllers.data_bivariate import DataBivariate
 from model.dataset import DataSet
+from model.datasets import DataSets
 
 app = Flask(__name__)
 

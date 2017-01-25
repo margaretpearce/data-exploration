@@ -1,11 +1,12 @@
 import os
-import jsonpickle
-import pandas as pd
 from collections import OrderedDict
 
-from data_driver import DataDriver
-from model.summary import Summary
+import jsonpickle
+import pandas as pd
+
 from configuration import paths
+from controllers.data_driver import DataDriver
+from model.summary import Summary
 
 
 class DataSummary(DataDriver):

@@ -7,9 +7,9 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import chi2_contingency
 
-from configuration import paths
 from configuration import const_types
-from data_driver import DataDriver
+from configuration import paths
+from controllers.data_driver import DataDriver
 from model.feature import Feature
 from model.interaction import Interaction
 from model.interactions import Interactions
