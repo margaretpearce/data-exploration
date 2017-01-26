@@ -200,8 +200,11 @@ class DataBivariate(DataDriver):
                                           frequencytable_firstrow=frequencytable_firstrow)
 
                 # Add to the collection of interactions
-                interactions_collection[base_feat] = interaction
-                feature_index += 1
+                if not self.check_feature_for_removal(interaction):
+                    interactions_collection[base_feat] = interaction
+                    feature_index += 1
+                else:
+                    features.remove(base_feature)
 
             # Create interactions object to represent the entire collection
             interactions = Interactions(name=self.title,
@@ -211,6 +214,20 @@ class DataBivariate(DataDriver):
 
             # Save the serialized JSON to a file
             self.save_json(json_to_write=interactions_json, suffix=paths.INTERACTIONS_SUFFIX)
+
+    def check_feature_for_removal(self, interaction):
+        # Return true if empty, else false
+        return not interaction.scatterplots and \
+            not interaction.correlations and \
+            not interaction.covariances and \
+            not interaction.boxplots and \
+            not interaction.statsbycategory and \
+            not interaction.statsbycategoryflipped and \
+            not interaction.stackedbarplots and \
+            not interaction.chisquared and \
+            not interaction.cramers and \
+            not interaction.mantelhchi and \
+            not interaction.frequency_table
 
     def get_freq_dictionary(self, feat1, feat2):
         freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
