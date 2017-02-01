@@ -131,19 +131,28 @@
         {% endif %}
         {% if f.feat_quantile_25 is not none %}
         <tr>
-            <td>25%</td>
+            <td>25% (Q1)
+                <a title="The middle number between the smallest value in the data and the median">
+                <img src="/static/graphics/infoicon.png"></a>
+            </td>
             <td>{{ f.feat_quantile_25 }}</td>
         </tr>
         {% endif %}
         {% if f.feat_quantile_75 is not none %}
         <tr>
-            <td>75%</td>
+            <td>75% (Q3)
+                <a title="The middle number between the median and the largest value in the data">
+                <img src="/static/graphics/infoicon.png"></a>
+            </td>
             <td>{{ f.feat_quantile_75 }}</td>
         </tr>
         {% endif %}
         {% if f.feat_quantile_75 is not none %}
         <tr>
-            <td>Interquartile range</td>
+            <td>Interquartile range
+                <a title="The difference between Q3 and Q1. The interquartile range (IQR) is a measure of variability.">
+                <img src="/static/graphics/infoicon.png"></a>
+            </td>
             <td>{{ f.feat_iqr }}</td>
         </tr>
         {% endif %}
@@ -155,13 +164,19 @@
         {% endif %}
         {% if f.feat_skew is not none %}
         <tr>
-            <td>Skew</td>
+            <td>Skewness
+                <a title="A measure of asymmetry. Negative values indicate that the data are skewed left and positive values indicate data that are skewed right.">
+                <img src="/static/graphics/infoicon.png"></a>
+            </td>
             <td>{{ f.feat_skew }}</td>
         </tr>
         {% endif %}
         {% if f.feat_kurtosis is not none %}
         <tr>
-            <td>Kurtosis</td>
+            <td>Kurtosis
+                <a title="A measure of whether the data are heavy-tailed or light-tailed relative to a normal distribution. Data sets with higher kurtosis values may have outliers.">
+                <img src="/static/graphics/infoicon.png"></a>
+            </td>
             <td>{{ f.feat_kurtosis }}</td>
         </tr>
         {% endif %}
