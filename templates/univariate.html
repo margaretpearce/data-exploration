@@ -40,17 +40,26 @@
             <h4>Count plot</h4>
             <img src="{{ f.graph_countplot }}" />
             {% endif %}
-        </div>
-        <div id="messages-{{ f.feat_index }}" class="table-hidden">
-            {% for e in f.errors %}
-            <p>e</p>
-            {% endfor %}
-            {% for w in f.warnings %}
-            <p>w</p>
-            {% endfor %}
-            {% for n in f.notes %}
-            <p>n</p>
-            {% endfor %}
+
+            <div id="messages-{{ f.feat_index }}" class="feature-comments">
+                {% if f.errors %}
+                {% for e in f.errors %}
+                <p>{{ e }}</p>
+                {% endfor %}
+                {% endif %}
+
+                {% if f.warnings %}
+                {% for w in f.warnings %}
+                <p><img src="/static/graphics/warningicon.png"> {{ w }}</p>
+                {% endfor %}
+                {% endif %}
+
+                {% if f.notes %}
+                {% for n in f.notes %}
+                <p>{{ n }}</p>
+                {% endfor %}
+                {% endif %}
+            </div>
         </div>
     {% endfor %}
 </div>

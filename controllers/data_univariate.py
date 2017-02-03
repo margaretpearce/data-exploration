@@ -102,6 +102,11 @@ class DataUnivariate(DataDriver):
                     countplot = sns.countplot(y=self.data[var_name].dropna())
                     graph_countplot = self.save_graph(countplot, filename=var_name + paths.FILE_COUNTPLOT)
 
+                # Errors, warnings, and info
+                feat_errors = self.get_errors(var_name)
+                feat_warnings = self.get_warnings(var_name)
+                feat_notes = self.get_notes(var_name)
+
                 # Save the feature stats
                 feature = Feature(feat_name=var_name,
                                   feat_index=feature_index,
@@ -125,7 +130,10 @@ class DataUnivariate(DataDriver):
                                   feat_mostcommon=var_mostcommon,
                                   feat_leastcommon=var_leastcommon,
                                   graph_histogram=graph_histogram,
-                                  graph_countplot=graph_countplot)
+                                  graph_countplot=graph_countplot,
+                                  feat_errors=feat_errors,
+                                  feat_warnings=feat_warnings,
+                                  feat_notes=feat_notes)
                 features_collection.append(feature)
                 feature_index += 1
 
@@ -150,11 +158,24 @@ class DataUnivariate(DataDriver):
 
         return var_mode
 
+    def get_count_missing(self, feat_name):
+        return int(self.data[feat_name].isnull().sum())
+
+    def get_percent_missing(self, feat_name):
+        missing_count = self.get_count_missing(feat_name)
+        missing_percent = 100 * missing_count / float(self.data.shape[0])
+        return missing_percent
+
     def get_errors(self, feat_name):
         return None
 
     def get_warnings(self, feat_name):
-        return None
+        warnings = []
+        if self.get_percent_unique(feat_name) == 1:
+            warnings.append("This feature has all unique values")
+        if self.get_percent_missing(feat_name) >= 50:
+            warnings.append("This feature is missing in 50% or more rows")
+        return warnings
 
     def get_notes(self, feat_name):
         return None

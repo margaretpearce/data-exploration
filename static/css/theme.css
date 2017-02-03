@@ -121,10 +121,20 @@ body {
 	width: 50%;
 }
 
-.feature-graphs {
+.feature-graphs, .feature-comments {
 	float: right;
 	width: 50%;
 }
+}
+
+.feature-comments {
+    width: 90%;
+    padding-top: 10px;
+}
+
+.feature-comments img {
+    width: 18px !important;
+    height: 18px !important;
 }
 
 .feature-graphs img {
