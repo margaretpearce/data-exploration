@@ -150,6 +150,15 @@ class DataUnivariate(DataDriver):
 
         return var_mode
 
+    def get_errors(self, feat_name):
+        return None
+
+    def get_warnings(self, feat_name):
+        return None
+
+    def get_notes(self, feat_name):
+        return None
+
     def load_features_json(self):
         features_json = self.load_json(paths.FEATURES_SUFFIX)
 

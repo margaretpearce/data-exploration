@@ -28,6 +28,33 @@
 </div>
 {% endif %}
 
+<div id="graphs">
+    {% for f in mydata.features %}
+        <div id="graph-{{ f.feat_index }}" class="feature-graphs table-hidden">
+            {% if f.graph_histogram is not none %}
+            <h4>Histogram</h4>
+            <img src="{{ f.graph_histogram }}" />
+            {% endif %}
+
+            {% if f.graph_countplot is not none %}
+            <h4>Count plot</h4>
+            <img src="{{ f.graph_countplot }}" />
+            {% endif %}
+        </div>
+        <div id="messages-{{ f.feat_index }}" class="table-hidden">
+            {% for e in f.errors %}
+            <p>e</p>
+            {% endfor %}
+            {% for w in f.warnings %}
+            <p>w</p>
+            {% endfor %}
+            {% for n in f.notes %}
+            <p>n</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
 <!-- Table with stats -->
 {% for f in mydata.features %}
 <div id="feature-{{ f.feat_index }}" class="feature-tables table-hidden">
@@ -206,21 +233,5 @@
 </div>
 {% endfor %}
 
-<div id="graphs">
-    {% for f in mydata.features %}
-        <div id="graph-{{ f.feat_index }}" class="feature-graphs table-hidden">
-            {% if f.graph_histogram is not none %}
-            <h4>Histogram</h4>
-            <img src="{{ f.graph_histogram }}" />
-            {% endif %}
 
-            {% if f.graph_countplot is not none %}
-            <h4>Count plot</h4>
-            <img src="{{ f.graph_countplot }}" />
-            {% endif %}
-        </div>
-    {% endfor %}
-    <!-- Histogram -->
-    <!-- Box plot -->
-</div>
 {% endblock %}
