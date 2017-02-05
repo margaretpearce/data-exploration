@@ -178,7 +178,10 @@ class DataUnivariate(DataDriver):
         return warnings
 
     def get_notes(self, feat_name):
-        return None
+        notes = []
+        if self.get_percent_missing(feat_name) == 0:
+            notes.append("This feature is not missing any values")
+        return notes
 
     def load_features_json(self):
         features_json = self.load_json(paths.FEATURES_SUFFIX)
