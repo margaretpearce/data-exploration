@@ -60,6 +60,12 @@ class DataDriver:
         graph_url = relative_path + self.title + str(paths.GRAPHS_SUBFOLDER + filename)
         return graph_url
 
+    def format_rounded_string(self, value):
+        if "." in str(value):
+            return str("%.3f" % float(value))
+        else:
+            return str(value)
+
     def get_data_type(self, feat_name):
         raw_type = str(self.data[feat_name].dtype)
         var_datatype = None
