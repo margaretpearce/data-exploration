@@ -96,9 +96,6 @@ class DataSummary(DataDriver):
 
         return num_rows_missing
 
-    def get_features_list(self):
-        return list(self.data.columns.values)
-
     def get_sample(self, num_records, features_list):
         num_samples = 5
         if num_records < num_samples:

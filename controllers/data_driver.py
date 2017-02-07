@@ -61,10 +61,15 @@ class DataDriver:
         return graph_url
 
     def format_rounded_string(self, value):
+        if value is None:
+            return None
         if "." in str(value):
             return str("%.3f" % float(value))
         else:
             return str(value)
+
+    def get_features_list(self):
+        return list(self.data.columns.values)
 
     def get_data_type(self, feat_name):
         raw_type = str(self.data[feat_name].dtype)
