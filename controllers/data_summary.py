@@ -1,6 +1,5 @@
 import os
 from collections import OrderedDict
-
 import jsonpickle
 import pandas as pd
 
@@ -13,6 +12,18 @@ class DataSummary(DataDriver):
     def __init__(self, selected_dataset):
         DataDriver.__init__(self, selected_dataset)
 
+    def load_summary_json(self):
+        # Try to load an existing JSON file
+        summary_json = self.load_json(paths.SUMMARY_SUFFIX)
+
+        # If the file doesn't exist, generate it
+        if summary_json is None:
+            self.generate_summary_json()
+            summary_json = self.load_json(paths.SUMMARY_SUFFIX)
+
+        # Return the JSON
+        return summary_json
+
     def generate_summary_json(self):
         load_success = True
 
@@ -21,34 +32,43 @@ class DataSummary(DataDriver):
             load_success = self.load_data()
 
         if load_success:
-            # Get summary stats about the data and serialize it as JSON
-            num_records = self.data.shape[0]
-            num_features = self.data.shape[1]
-            index_column = self.id_column
-            label_column = self.label_column
-
-            # Count the number of columns missing for each row
-            num_rows_missing = self.count_missing(num_records)
-
-            # List of features
-            features_list = list(self.data.columns.values)
-
-            # Sample data (five rows or less)
-            sample_list = self.get_sample(num_records, features_list)
-
-            summary = Summary(name=self.title,
-                              num_records=num_records,
-                              num_features=num_features,
-                              index_column=index_column,
-                              label_column=label_column,
-                              rows_missing=num_rows_missing,
-                              features_list=features_list,
-                              sample_list=sample_list
-                              )
+            summary = self.get_summary()
             summary_json = jsonpickle.encode(summary)
 
             # Save the serialized JSON to a file
             self.save_json(json_to_write=summary_json, suffix=paths.SUMMARY_SUFFIX)
+
+    def get_summary(self):
+        # Get summary stats about the data and serialize it as JSON
+        num_records = self.get_num_records()
+        num_features = self.get_num_features()
+        index_column = self.id_column
+        label_column = self.label_column
+
+        # Count the number of columns missing for each row
+        num_rows_missing = self.count_missing(num_records)
+
+        # List of features
+        features_list = self.get_features_list()
+
+        # Sample data (five rows or less)
+        sample_list = self.get_sample(num_records, features_list)
+
+        summary = Summary(name=self.title,
+                          num_records=num_records,
+                          num_features=num_features,
+                          index_column=index_column,
+                          label_column=label_column,
+                          rows_missing=num_rows_missing,
+                          features_list=features_list,
+                          sample_list=sample_list)
+        return summary
+
+    def get_num_records(self):
+        return self.data.shape[0]
+
+    def get_num_features(self):
+        return self.data.shape[1]
 
     def count_missing(self, num_records):
         # Count the number of columns missing for each row
@@ -76,6 +96,9 @@ class DataSummary(DataDriver):
 
         return num_rows_missing
 
+    def get_features_list(self):
+        return list(self.data.columns.values)
+
     def get_sample(self, num_records, features_list):
         num_samples = 5
         if num_records < num_samples:
@@ -83,15 +106,3 @@ class DataSummary(DataDriver):
 
         sample_list = self.data.sample(num_samples)[features_list].values.tolist()
         return sample_list
-
-    def load_summary_json(self):
-        # Try to load an existing JSON file
-        summary_json = self.load_json(paths.SUMMARY_SUFFIX)
-
-        # If the file doesn't exist, generate it
-        if summary_json is None:
-            self.generate_summary_json()
-            summary_json = self.load_json(paths.SUMMARY_SUFFIX)
-
-        # Return the JSON
-        return summary_json
