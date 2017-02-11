@@ -18,3 +18,5 @@ __pycache__/*
 .idea/*
 static/graphics/*.psd
 static/graphics/plusicon.psd
+tests/.cache/*
+tests/.cache
