@@ -1,8 +1,12 @@
+# Ugly hack to fix imports
+import sys, os
+sys.path.insert(0, os.path.abspath('..'))
+
 from controllers.data_summary import DataSummary
 from model.summary import Summary
 
 
-def load_summary_json_test():
+def test_load_summary_json():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
 
@@ -13,7 +17,7 @@ def load_summary_json_test():
 
     assert actual == expected
 
-def get_num_records_test():
+def test_get_num_records():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
     summary.load_data()
@@ -23,7 +27,7 @@ def get_num_records_test():
 
     assert expected == actual
 
-def get_num_features_test():
+def test_get_num_features():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
     summary.load_data()
@@ -33,7 +37,7 @@ def get_num_features_test():
 
     assert expected == actual
 
-def count_missing_test():
+def test_count_missing():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
     summary.load_data()
@@ -48,7 +52,7 @@ def count_missing_test():
 
     assert missing_sum == num_records
 
-def get_sample_returns_list_test():
+def test_get_sample_returns_list():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
     summary.load_data()
@@ -59,7 +63,7 @@ def get_sample_returns_list_test():
 
     assert expected == actual
 
-def get_sample_size_test():
+def test_get_sample_size():
     dataset = ['titanic.csv', 'Titanic', 'PassengerId', 'Survived', False]
     summary = DataSummary(dataset)
     summary.load_data()
@@ -70,12 +74,3 @@ def get_sample_size_test():
     actual = len(sample)
 
     assert expected == actual
-
-if __name__ == '__main__':
-    load_summary_json_test()
-    get_num_records_test()
-    get_num_features_test()
-    count_missing_test()
-    get_sample_returns_list_test()
-    get_sample_size_test()
-    print("done")
