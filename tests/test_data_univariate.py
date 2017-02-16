@@ -40,7 +40,29 @@ class TestDataUnivariate:
         actual = self.univariate.get_count("Fare")
         assert actual == expected
 
-    def test_count_missing_vals(self):
+    def test_count_with_missing_vals(self):
         expected = 714
         actual = self.univariate.get_count("Age")
         assert actual == expected
+
+    def test_get_count_missing_string(self):
+        expected = 687
+        actual = self.univariate.get_count_missing("Cabin")
+        assert actual == expected
+
+    def test_get_count_missing_float(self):
+        expected = 177
+        actual = self.univariate.get_count_missing("Age")
+        assert actual == expected
+
+    def test_count_plus_missing_equals_length(self):
+        not_missing_count = self.univariate.get_count("Age")
+        missing_count = self.univariate.get_count_missing("Age")
+        total_count_expected = 891
+        assert total_count_expected == missing_count + not_missing_count
+
+    def test_count_missing_none_missing(self):
+        expected = 0
+        actual = self.univariate.get_count_missing("PassengerId")
+        assert actual == expected
+
