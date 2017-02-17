@@ -69,7 +69,7 @@ class TestDataUnivariate:
     def test_count_percent_missing(self):
         num_missing = self.univariate.get_count_missing("Age")
         num_rows = 891
-        expected = 100* num_missing / float(num_rows)
+        expected = 100 * num_missing / float(num_rows)
         actual = self.univariate.get_percent_missing("Age")
         assert actual == expected
 
@@ -92,3 +92,23 @@ class TestDataUnivariate:
         expected = True
         actual = self.univariate.feat_is_numeric("Survived")
         assert actual == expected
+
+    def test_get_average_binary(self):
+        expected = 0.384
+        actual = round(self.univariate.get_average("Survived"), 3)
+        assert expected == actual
+
+    def test_get_average_float(self):
+        expected = 29.699
+        actual = round(self.univariate.get_average("Age"), 3)
+        assert expected == actual
+
+    def test_get_average_string(self):
+        expected = None
+        actual = self.univariate.get_average("Name")
+        assert expected == actual
+
+    def test_get_average_int(self):
+        expected = 0.523
+        actual = round(self.univariate.get_average("SibSp"), 3)
+        assert expected == actual
