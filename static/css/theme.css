@@ -26,9 +26,10 @@ body {
     margin: auto;
     float: left;
 }
+/*
 .table {
 	table-layout: fixed;
-}
+}*/
 }
 
 .panel-body-right {
