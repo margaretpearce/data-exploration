@@ -231,6 +231,10 @@ class DataBivariate(DataDriver):
     def get_horizontal_boxplot(self, base_feat, compare_feat):
         if self.check_uniques_for_graphing(compare_feat):
             boxplot = sns.boxplot(x=base_feat, y=compare_feat, orient="h", data=self.data[[compare_feat, base_feat]])
+
+            if self.get_count_unique(base_feat) > 8:
+                boxplot.set_xticklabels(labels=boxplot.get_xticklabels(), rotation=45)
+
             return self.save_graph(boxplot, filename=base_feat + "_" + compare_feat + paths.FILE_BOXCHART)
 
         return None
