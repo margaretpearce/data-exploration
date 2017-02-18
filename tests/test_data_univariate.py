@@ -112,3 +112,8 @@ class TestDataUnivariate:
         expected = 0.523
         actual = round(self.univariate.get_average("SibSp"), 3)
         assert expected == actual
+
+    def test_get_median_int(self):
+        expected = 0
+        actual = self.univariate.get_median("SibSp")
+        assert expected == actual
