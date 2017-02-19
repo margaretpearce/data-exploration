@@ -272,3 +272,47 @@ class TestDataUnivariate:
         expected = None
         actual = self.univariate.get_quantile75("Name")
         assert expected == actual
+
+    def test_get_iqr_int(self):
+        field_name = "SibSp"
+        expected = round(self.univariate.get_quantile75(field_name) - self.univariate.get_quantile25(field_name), 3)
+        actual = round(self.univariate.get_iqr(field_name), 3)
+        assert expected == actual
+
+    def test_get_iqr_float(self):
+        field_name = "Age"
+        expected = round(self.univariate.get_quantile75(field_name) - self.univariate.get_quantile25(field_name), 3)
+        actual = round(self.univariate.get_iqr(field_name), 3)
+        assert expected == actual
+
+    def test_get_iqr_binary(self):
+        field_name = "Survived"
+        expected = round(self.univariate.get_quantile75(field_name) - self.univariate.get_quantile25(field_name), 3)
+        actual = round(self.univariate.get_iqr(field_name), 3)
+        assert expected == actual
+
+    def test_get_iqr_string(self):
+        field_name = "Name"
+        expected = None
+        actual = self.univariate.get_iqr(field_name)
+        assert expected == actual
+
+    def test_get_skew_int(self):
+        expected = 3.695
+        actual = round(self.univariate.get_skew("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_skew_float(self):
+        expected = 0.389
+        actual = round(self.univariate.get_skew("Age"), 3)
+        assert expected == actual
+
+    def test_get_skew_binary(self):
+        expected = 0.479
+        actual = round(self.univariate.get_skew("Survived"), 3)
+        assert expected == actual
+
+    def test_get_skew_string(self):
+        expected = None
+        actual = self.univariate.get_skew("Name")
+        assert expected == actual
