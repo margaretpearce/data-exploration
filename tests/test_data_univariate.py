@@ -117,3 +117,38 @@ class TestDataUnivariate:
         expected = 0
         actual = self.univariate.get_median("SibSp")
         assert expected == actual
+
+    def test_get_median_float(self):
+        expected = 28
+        actual = self.univariate.get_median("Age")
+        assert expected == actual
+
+    def test_get_median_binary(self):
+        expected = 0
+        actual = self.univariate.get_median("Survived")
+        assert expected == actual
+
+    def test_get_median_string(self):
+        expected = None
+        actual = self.univariate.get_median("Name")
+        assert expected == actual
+
+    def test_get_mode_int(self):
+        expected = "0"
+        actual = self.univariate.get_mode("SibSp").strip()
+        assert expected == actual
+
+    def test_get_mode_float(self):
+        expected = "24.0"
+        actual = self.univariate.get_mode("Age").strip()
+        assert expected == actual
+
+    def test_get_mode_binary(self):
+        expected = "0"
+        actual = self.univariate.get_mode("Survived").strip()
+        assert expected == actual
+
+    def test_get_mode_string(self):
+        expected = "S"
+        actual = self.univariate.get_mode("Embarked").strip()
+        assert expected == actual
