@@ -152,3 +152,63 @@ class TestDataUnivariate:
         expected = "S"
         actual = self.univariate.get_mode("Embarked").strip()
         assert expected == actual
+
+    def test_get_max_int(self):
+        expected = 8
+        actual = self.univariate.get_max("SibSp")
+        assert expected == actual
+
+    def test_get_max_float(self):
+        expected = 80
+        actual = self.univariate.get_max("Age")
+        assert expected == actual
+
+    def test_get_max_binary(self):
+        expected = 1
+        actual = self.univariate.get_max("Survived")
+        assert expected == actual
+
+    def test_get_max_string(self):
+        expected = None
+        actual = self.univariate.get_max("Name")
+        assert expected == actual
+
+    def test_get_min_int(self):
+        expected = 0
+        actual = self.univariate.get_min("SibSp")
+        assert expected == actual
+
+    def test_get_min_float(self):
+        expected = 0.42
+        actual = self.univariate.get_min("Age")
+        assert expected == actual
+
+    def test_get_min_binary(self):
+        expected = 0
+        actual = self.univariate.get_min("Survived")
+        assert expected == actual
+
+    def test_get_min_string(self):
+        expected = None
+        actual = self.univariate.get_min("Name")
+        assert expected == actual
+
+    def test_get_stddev_int(self):
+        expected = 1.103
+        actual = round(self.univariate.get_stddev("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_stddev_float(self):
+        expected = 14.526
+        actual = round(self.univariate.get_stddev("Age"), 3)
+        assert expected == actual
+
+    def test_get_stddev_binary(self):
+        expected = 0.487
+        actual = round(self.univariate.get_stddev("Survived"), 3)
+        assert expected == actual
+
+    def test_get_stddev_string(self):
+        expected = None
+        actual = self.univariate.get_stddev("Name")
+        assert expected == actual
