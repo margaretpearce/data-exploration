@@ -212,3 +212,63 @@ class TestDataUnivariate:
         expected = None
         actual = self.univariate.get_stddev("Name")
         assert expected == actual
+
+    def test_get_variance_int(self):
+        expected = 1.216
+        actual = round(self.univariate.get_variance("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_variance_float(self):
+        expected = 211.019
+        actual = round(self.univariate.get_variance("Age"), 3)
+        assert expected == actual
+
+    def test_get_variance_binary(self):
+        expected = 0.237
+        actual = round(self.univariate.get_variance("Survived"), 3)
+        assert expected == actual
+
+    def test_get_variance_name(self):
+        expected = None
+        actual = self.univariate.get_variance("Name")
+        assert expected == actual
+
+    def test_get_quantile25_int(self):
+        expected = 0.000
+        actual = round(self.univariate.get_quantile25("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_quantile25_float(self):
+        expected = 20.125
+        actual = round(self.univariate.get_quantile25("Age"), 3)
+        assert expected == actual
+
+    def test_get_quantile25_binary(self):
+        expected = 0.000
+        actual = round(self.univariate.get_quantile25("Survived"), 3)
+        assert expected == actual
+
+    def test_get_quantile25_string(self):
+        expected = None
+        actual = self.univariate.get_quantile25("Name")
+        assert expected == actual
+
+    def test_get_quantile75_int(self):
+        expected = 1.000
+        actual = round(self.univariate.get_quantile75("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_quantile75_float(self):
+        expected = 38.000
+        actual = round(self.univariate.get_quantile75("Age"), 3)
+        assert expected == actual
+
+    def test_get_quantile75_binary(self):
+        expected = 1.000
+        actual = round(self.univariate.get_quantile75("Survived"), 3)
+        assert expected == actual
+
+    def test_get_quantile75_string(self):
+        expected = None
+        actual = self.univariate.get_quantile75("Name")
+        assert expected == actual
