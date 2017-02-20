@@ -316,3 +316,73 @@ class TestDataUnivariate:
         expected = None
         actual = self.univariate.get_skew("Name")
         assert expected == actual
+
+    def test_get_kurtosis_int(self):
+        expected = 17.880
+        actual = round(self.univariate.get_kurtosis("SibSp"), 3)
+        assert expected == actual
+
+    def test_get_kurtosis_float(self):
+        expected = 0.178
+        actual = round(self.univariate.get_kurtosis("Age"), 3)
+        assert expected == actual
+
+    def test_get_kurtosis_binary(self):
+        expected = -1.775
+        actual = round(self.univariate.get_kurtosis("Survived"), 3)
+        assert expected == actual
+
+    def test_get_kurtosis_string(self):
+        expected = None
+        actual = self.univariate.get_kurtosis("Name")
+        assert expected == actual
+
+    def test_get_most_common_int(self):
+        expected = None
+        actual = self.univariate.get_mostcommon("SibSp")
+        assert expected == actual
+
+    def test_get_most_common_float(self):
+        expected = None
+        actual = self.univariate.get_mostcommon("Age")
+        assert expected == actual
+
+    def test_get_most_common_binary(self):
+        expected = None
+        actual = self.univariate.get_mostcommon("Survived")
+        assert expected == actual
+
+    def test_get_most_common_val_string(self):
+        expected = "S"
+        actual = self.univariate.get_mostcommon("Embarked")
+        assert expected in actual
+
+    def test_get_most_common_count_string(self):
+        expected = "644"
+        actual = self.univariate.get_mostcommon("Embarked")
+        assert expected in actual
+
+    def test_get_least_common_int(self):
+        expected = None
+        actual = self.univariate.get_leastcommon("SibSp")
+        assert expected == actual
+
+    def test_get_least_common_float(self):
+        expected = None
+        actual = self.univariate.get_leastcommon("Age")
+        assert expected == actual
+
+    def test_get_least_common_binary(self):
+        expected = None
+        actual = self.univariate.get_leastcommon("Survived")
+        assert expected == actual
+
+    def test_get_least_common_val_string(self):
+        expected = "Q"
+        actual = self.univariate.get_leastcommon("Embarked")
+        assert expected in actual
+
+    def test_get_least_common_count_string(self):
+        expected = "77"
+        actual = self.univariate.get_leastcommon("Embarked")
+        assert expected in actual
