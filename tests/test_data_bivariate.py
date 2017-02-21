@@ -21,8 +21,6 @@ class TestDataBivariate:
         cls.interaction_float = cls.bivariate.get_feature_interactions("Age", 0, cls.features_list,
                                                                        cls.stats_category_list)
 
-
-
     def test_load_bivariate_json(self):
         interactions_loaded = self.bivariate.load_interactions_json()
         actual = type(interactions_loaded)
