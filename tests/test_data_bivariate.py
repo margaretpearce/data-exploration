@@ -20,6 +20,8 @@ class TestDataBivariate:
                                                                      cls.stats_category_list)
         cls.interaction_float = cls.bivariate.get_feature_interactions("Age", 0, cls.features_list,
                                                                        cls.stats_category_list)
+        cls.interaction_binary = cls.bivariate.get_feature_interactions("Survived", 0, cls.features_list,
+                                                                       cls.stats_category_list)
 
     def test_load_bivariate_json(self):
         interactions_loaded = self.bivariate.load_interactions_json()
@@ -113,3 +115,44 @@ class TestDataBivariate:
     def test_get_feature_interactions_float_scatterplots(self):
         actual = self.interaction_float
         assert actual.scatterplots is not {}
+
+    # Base feat: binary
+    def test_get_feature_interactions_binary_statsbycategory(self):
+        actual = self.interaction_binary
+        assert actual.statsbycategory is not {}
+
+    def test_get_feature_interactions_binary_statsbycategoryflipped(self):
+        actual = self.interaction_binary
+        assert actual.statsbycategoryflipped == {}
+
+    def test_get_feature_interactions_binary_frequencies(self):
+        actual = self.interaction_binary
+        assert actual.frequency_table is not {}
+
+    def test_get_feature_interactions_binary_boxplots(self):
+        actual = self.interaction_binary
+        assert actual.boxplots is not {}
+
+    def test_get_feature_interactions_binary_stackedbarplots(self):
+        actual = self.interaction_binary
+        assert actual.stackedbarplots is not {}
+
+    def test_get_feature_interactions_binary_correlations(self):
+        actual = self.interaction_binary
+        assert actual.correlations == {}
+
+    def test_get_feature_interactions_binary_covariance(self):
+        actual = self.interaction_binary
+        assert actual.covariances == {}
+
+    def test_get_feature_interactions_binary_chisquared(self):
+        actual = self.interaction_binary
+        assert actual.chisquared is not {}
+
+    def test_get_feature_interactions_binary_cramers(self):
+        actual = self.interaction_binary
+        assert actual.cramers is not {}
+
+    def test_get_feature_interactions_binary_scatterplots(self):
+        actual = self.interaction_binary
+        assert actual.scatterplots == {}
