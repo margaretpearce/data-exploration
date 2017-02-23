@@ -22,6 +22,8 @@ class TestDataBivariate:
                                                                        cls.stats_category_list)
         cls.interaction_binary = cls.bivariate.get_feature_interactions("Survived", 0, cls.features_list,
                                                                        cls.stats_category_list)
+        cls.interaction_string = cls.bivariate.get_feature_interactions("Embarked", 0, cls.features_list,
+                                                                        cls.stats_category_list)
 
     def test_load_bivariate_json(self):
         interactions_loaded = self.bivariate.load_interactions_json()
@@ -155,4 +157,45 @@ class TestDataBivariate:
 
     def test_get_feature_interactions_binary_scatterplots(self):
         actual = self.interaction_binary
+        assert actual.scatterplots == {}
+
+    # Base feat: string
+    def test_get_feature_interactions_string_statsbycategory(self):
+        actual = self.interaction_string
+        assert actual.statsbycategory is not {}
+
+    def test_get_feature_interactions_string_statsbycategoryflipped(self):
+        actual = self.interaction_string
+        assert actual.statsbycategoryflipped == {}
+
+    def test_get_feature_interactions_string_frequencies(self):
+        actual = self.interaction_string
+        assert actual.frequency_table is not {}
+
+    def test_get_feature_interactions_string_boxplots(self):
+        actual = self.interaction_string
+        assert actual.boxplots is not {}
+
+    def test_get_feature_interactions_string_stackedbarplots(self):
+        actual = self.interaction_string
+        assert actual.stackedbarplots is not {}
+
+    def test_get_feature_interactions_string_correlations(self):
+        actual = self.interaction_string
+        assert actual.correlations == {}
+
+    def test_get_feature_interactions_string_covariance(self):
+        actual = self.interaction_string
+        assert actual.covariances == {}
+
+    def test_get_feature_interactions_string_chisquared(self):
+        actual = self.interaction_string
+        assert actual.chisquared is not {}
+
+    def test_get_feature_interactions_string_cramers(self):
+        actual = self.interaction_string
+        assert actual.cramers is not {}
+
+    def test_get_feature_interactions_string_scatterplots(self):
+        actual = self.interaction_string
         assert actual.scatterplots == {}
