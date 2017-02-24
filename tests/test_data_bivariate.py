@@ -199,3 +199,15 @@ class TestDataBivariate:
     def test_get_feature_interactions_string_scatterplots(self):
         actual = self.interaction_string
         assert actual.scatterplots == {}
+
+    def test_get_correlation_range(self):
+        correlation = self.bivariate.get_correlation("Age", "Fare")
+        assert -1 <= correlation and correlation <= 1
+
+    def test_get_correlation_one_noncontinuous(self):
+        correlation = self.bivariate.get_correlation("Age", "Name")
+        assert correlation is None
+
+    def test_get_correlation_both_noncontinuous(self):
+        correlation = self.bivariate.get_correlation("Embarked", "Name")
+        assert correlation is None
