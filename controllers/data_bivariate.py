@@ -375,9 +375,17 @@ class DataBivariate(DataDriver):
         return None
 
     def get_chisquared(self, feat1, feat2):
-        freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
-        if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
-            return chi2_contingency(freq_table.dropna())
+        base_vartype = self.get_variable_type(feat1)
+        compare_vartype = self.get_variable_type(feat2)
+
+        if (base_vartype == const_types.VARTYPE_CATEGORICAL or base_vartype == const_types.VARTYPE_BINARY) and \
+                (compare_vartype == const_types.VARTYPE_CATEGORICAL or compare_vartype == const_types.VARTYPE_BINARY):
+
+            freq_table = pd.crosstab(self.data[feat1], self.data[feat2])
+            if len(list(filter(lambda x: x < 5, freq_table.values.flatten()))) == 0:
+                return chi2_contingency(freq_table.dropna())
+
+        return None
 
     def get_cramersv(self, base_feat, compare_feat):
         base_vartype = self.get_variable_type(base_feat)

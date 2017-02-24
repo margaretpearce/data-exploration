@@ -211,3 +211,12 @@ class TestDataBivariate:
     def test_get_correlation_both_noncontinuous(self):
         correlation = self.bivariate.get_correlation("Embarked", "Name")
         assert correlation is None
+
+    def test_chisquared_pvalue_range(self):
+        chisquared = self.bivariate.get_chisquared("Survived", "Sex")
+        p_value = chisquared[1]
+        assert 0 <= p_value and p_value <= 1
+
+    def test_chisquared_pvalue_onecontinuous(self):
+        chisquared = self.bivariate.get_chisquared("Survived", "Age")
+        assert chisquared is None
