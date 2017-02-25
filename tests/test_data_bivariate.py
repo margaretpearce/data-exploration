@@ -217,6 +217,22 @@ class TestDataBivariate:
         p_value = chisquared[1]
         assert 0 <= p_value and p_value <= 1
 
-    def test_chisquared_pvalue_onecontinuous(self):
+    def test_chisquared_pvalue_one_continuous(self):
         chisquared = self.bivariate.get_chisquared("Survived", "Age")
         assert chisquared is None
+
+    def test_chisquared_pvalue_both_continuous(self):
+        chisquared = self.bivariate.get_chisquared("Fare", "Age")
+        assert chisquared is None
+
+    def test_cramersv_range(self):
+        cramersv = self.bivariate.get_cramersv("Survived", "Pclass")
+        assert 0 <= cramersv and cramersv <= 1
+
+    def test_cramersv_one_continuous(self):
+        cramersv = self.bivariate.get_cramersv("Survived", "Age")
+        assert cramersv is None
+
+    def test_cramersv_both_continuous(self):
+        cramersv = self.bivariate.get_cramersv("Fare", "Age")
+        assert cramersv is None
