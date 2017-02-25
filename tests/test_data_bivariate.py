@@ -200,9 +200,13 @@ class TestDataBivariate:
         actual = self.interaction_string
         assert actual.scatterplots == {}
 
-    def test_get_correlation_range(self):
+    def test_get_correlation_lower_bound(self):
         correlation = self.bivariate.get_correlation("Age", "Fare")
-        assert -1 <= correlation and correlation <= 1
+        assert -1 <= correlation
+
+    def test_get_correlation_upper_bound(self):
+        correlation = self.bivariate.get_correlation("Age", "Fare")
+        assert correlation <= 1
 
     def test_get_correlation_one_noncontinuous(self):
         correlation = self.bivariate.get_correlation("Age", "Name")
@@ -212,10 +216,15 @@ class TestDataBivariate:
         correlation = self.bivariate.get_correlation("Embarked", "Name")
         assert correlation is None
 
-    def test_chisquared_pvalue_range(self):
+    def test_chisquared_pvalue_lower_bound(self):
         chisquared = self.bivariate.get_chisquared("Survived", "Sex")
         p_value = chisquared[1]
-        assert 0 <= p_value and p_value <= 1
+        assert 0 <= p_value
+
+    def test_chisquared_pvalue_upper_bound(self):
+        chisquared = self.bivariate.get_chisquared("Survived", "Sex")
+        p_value = chisquared[1]
+        assert p_value <= 1
 
     def test_chisquared_pvalue_one_continuous(self):
         chisquared = self.bivariate.get_chisquared("Survived", "Age")
