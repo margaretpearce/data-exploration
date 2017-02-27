@@ -3,7 +3,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 
 from controllers.data_driver import DataDriver
-
+from configuration import const_types
 
 class TestDataDriver:
     @classmethod
@@ -30,4 +30,22 @@ class TestDataDriver:
     def test_format_rounded_string_int(self):
         actual = self.driver.format_rounded_string(3)
         expected = "3"
+        assert actual == expected
+
+    def test_get_features_list_label(self):
+        actual = self.driver.get_features_list()
+        assert self.driver.label_column in actual
+
+    def test_get_features_list_id(self):
+        actual = self.driver.get_features_list()
+        assert self.driver.id_column in actual
+
+    def test_get_data_type_boolean(self):
+        actual = self.driver.get_data_type("Survived")
+        expected = const_types.DATATYPE_BOOLEAN
+        assert actual == expected
+
+    def test_get_data_type_int(self):
+        actual = self.driver.get_data_type("SibSp")
+        expected = const_types.DATATYPE_INTEGER
         assert actual == expected
