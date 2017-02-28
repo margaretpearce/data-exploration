@@ -65,5 +65,13 @@ class TestDataDriver:
         expected = const_types.VARTYPE_CONTINUOUS
         assert actual == expected
 
+    def test_get_variable_type_categorical(self):
+        actual = self.driver.get_variable_type("Embarked")
+        expected = const_types.VARTYPE_CATEGORICAL
+        assert actual == expected
 
+    def test_get_variable_type_binary(self):
+        actual = self.driver.get_variable_type("Survived")
+        expected = const_types.VARTYPE_BINARY
+        assert actual == expected
 
