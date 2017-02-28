@@ -49,3 +49,21 @@ class TestDataDriver:
         actual = self.driver.get_data_type("SibSp")
         expected = const_types.DATATYPE_INTEGER
         assert actual == expected
+
+    def test_get_data_type_float(self):
+        actual = self.driver.get_data_type("Age")
+        expected = const_types.DATATYPE_FLOAT
+        assert actual == expected
+
+    def test_get_data_type_string(self):
+        actual = self.driver.get_data_type("Name")
+        expected = const_types.DATATYPE_STRING
+        assert actual == expected
+
+    def test_get_variable_type_continous(self):
+        actual = self.driver.get_variable_type("Age")
+        expected = const_types.VARTYPE_CONTINUOUS
+        assert actual == expected
+
+
+
