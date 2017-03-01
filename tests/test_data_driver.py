@@ -75,3 +75,17 @@ class TestDataDriver:
         expected = const_types.VARTYPE_BINARY
         assert actual == expected
 
+    def test_get_percent_unique_all(self):
+        actual = self.driver.get_percent_unique("Name")
+        expected = 1
+        assert actual == expected
+
+    def test_get_percent_unique_some(self):
+        actual = self.driver.get_percent_unique("Embarked")
+        expected = self.driver.get_count_unique("Embarked") / float(self.driver.data["Embarked"].count())
+        assert actual == expected
+
+    def test_get_percent_unique_float(self):
+        actual = self.driver.get_percent_unique("Age")
+        expected = self.driver.get_count_unique("Age") / float(self.driver.data["Age"].count())
+        assert actual == expected
