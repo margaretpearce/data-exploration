@@ -89,3 +89,18 @@ class TestDataDriver:
         actual = self.driver.get_percent_unique("Age")
         expected = self.driver.get_count_unique("Age") / float(self.driver.data["Age"].count())
         assert actual == expected
+
+    def test_get_percent_unique_missingvals(self):
+        actual = self.driver.get_percent_unique("Cabin")
+        expected = self.driver.get_count_unique("Cabin") / float(self.driver.data["Cabin"].count())
+        assert actual == expected
+
+    def test_get_count_unique_categorical(self):
+        actual = self.driver.get_count_unique("Sex")
+        expected = 2
+        assert actual == expected
+
+    def test_get_count_unique_binary(self):
+        actual = self.driver.get_count_unique("Survived")
+        expected = 2
+        assert actual == expected
