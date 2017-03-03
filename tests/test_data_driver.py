@@ -104,3 +104,23 @@ class TestDataDriver:
         actual = self.driver.get_count_unique("Survived")
         expected = 2
         assert actual == expected
+
+    def test_get_count_unique_missingvals(self):
+        actual = self.driver.get_count_unique("Embarked")
+        expected = 4 # Three real values, one "null"
+        assert actual == expected
+
+    def test_check_uniques_for_graphing_valid(self):
+        actual = self.driver.check_uniques_for_graphing("Embarked")
+        expected = True
+        assert actual == expected
+
+    def test_check_uniques_for_graphing_too_high_count(self):
+        actual = self.driver.check_uniques_for_graphing("Ticket")
+        expected = False
+        assert actual == expected
+
+    def test_check_uniques_for_graphing_too_high_perc(self):
+        actual = self.driver.check_uniques_for_graphing("Name")
+        expected = False
+        assert actual == expected
