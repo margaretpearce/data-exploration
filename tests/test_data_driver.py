@@ -124,3 +124,8 @@ class TestDataDriver:
         actual = self.driver.check_uniques_for_graphing("Name")
         expected = False
         assert actual == expected
+
+    def test_get_error_msg_none(self):
+        actual = self.driver.get_error_msg()
+        expected = None
+        assert actual == expected
