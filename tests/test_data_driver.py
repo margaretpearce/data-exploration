@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 from controllers.data_driver import DataDriver
 from configuration import const_types
+from configuration import paths
 
 class TestDataDriver:
     @classmethod
@@ -129,3 +130,19 @@ class TestDataDriver:
         actual = self.driver.get_error_msg()
         expected = None
         assert actual == expected
+
+    def test_load_json_summary(self):
+        actual = self.driver.load_json(paths.SUMMARY_SUFFIX)
+        assert actual is not None
+
+    def test_load_json_features(self):
+        actual = self.driver.load_json(paths.FEATURES_SUFFIX)
+        assert actual is not None
+
+    def test_load_json_interactions(self):
+        actual = self.driver.load_json(paths.INTERACTIONS_SUFFIX)
+        assert actual is not None
+
+    def test_load_json_nonexistent(self):
+        actual = self.driver.load_json("other.json")
+        assert actual is None
