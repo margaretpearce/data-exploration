@@ -2,6 +2,8 @@ import os
 import re
 import jsonpickle
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # avoid tkinter issues
 import seaborn as sns
 
 from configuration import paths
